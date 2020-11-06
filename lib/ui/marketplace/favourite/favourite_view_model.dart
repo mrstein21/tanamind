@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tanamind/ui/marketplace/favourite/favourite.dart';
 
-abstract class FavouriteViewModel extends State<Favourite>{
+abstract class FavouriteViewModel extends State<FavouriteScreen>{
   var list_favourite=[
     {
       "name":"Bibit Kangkung",

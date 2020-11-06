@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tanamind/ui/list_plan/list_plant.dart';
+import 'package:tanamind/ui/list_plan/list_plant_screen.dart';
 
-abstract class ListPlantViewModel extends State<ListPlant>{
+abstract class ListPlantViewModel extends State<ListPlantScreen>{
   var list_plant=[
     {
       "name":"Pokcay",
