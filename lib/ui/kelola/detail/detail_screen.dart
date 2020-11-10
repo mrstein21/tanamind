@@ -1,5 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:share/share.dart';
 import 'package:tanamind/ui/kelola/detail/detail_screen_view_model.dart';
 
 class DetailTanamanKu extends StatefulWidget {
@@ -10,11 +17,30 @@ class DetailTanamanKu extends StatefulWidget {
 class DetailScreenView extends DetailScreenViewModel {
   Size size;
 
+
+  shared() async {
+    final RenderBox box = context.findRenderObject();
+    Share.share('',
+        subject: '',
+        sharePositionOrigin:
+        box.localToGlobal(Offset.zero) &
+        box.size);
+  }
+
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              icon: Icon(Icons.share),
+              onPressed: () async {
+                shared();
+
+              })
+        ],
+      ),
       body: ListView(
         children: [
           _buildImage(size.height),

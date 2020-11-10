@@ -158,7 +158,7 @@ class KelolaViewScreen extends KelolaViewModel {
                             LinearProgressIndicator(
                               minHeight: 6,
                               backgroundColor: Colors.grey[300],
-                              value: 0.3,
+                              value: list[index]['panen'],
                               valueColor: new AlwaysStoppedAnimation<Color>(Colors.green),
                             ),
                             SizedBox(height: 8,),

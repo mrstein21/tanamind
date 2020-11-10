@@ -4,11 +4,11 @@ import 'file:///C:/Users/Drow/AndroidStudioProjects/CODEHOUSE_Tanamind/lib/ui/ke
 
 abstract class KelolaViewModel extends State<KelolaScreen>{
   var listTanaman = [
-    {'title':'Cengek Jeletot', 'panen':'5','image':'assets/cengek.jpg'},
-    {'title':'FakCoy', 'panen':'1','image':'assets/pokcoy.jpg'},
-    {'title':'Bayam', 'panen':'3','image':'assets/bayam.jpg'},
-    {'title':'Toge', 'panen':'3','image':'assets/toge.jpg'},
-    {'title':'Lidah Buaya', 'panen':'2','image':'assets/lidahbuaya.jpg'},
+    {'title':'Cengek Jeletot', 'panen':0.5,'image':'assets/cengek.jpg'},
+    {'title':'FakCoy', 'panen':0.1,'image':'assets/pokcoy.jpg'},
+    {'title':'Bayam', 'panen':0.2,'image':'assets/bayam.jpg'},
+    {'title':'Toge', 'panen':0.3,'image':'assets/toge.jpg'},
+    {'title':'Lidah Buaya', 'panen':0.2,'image':'assets/lidahbuaya.jpg'},
   ];
 
   var listFilter = [
