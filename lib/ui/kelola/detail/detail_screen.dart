@@ -1,11 +1,9 @@
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 import 'package:tanamind/ui/kelola/detail/detail_screen_view_model.dart';
 
@@ -19,9 +17,18 @@ class DetailScreenView extends DetailScreenViewModel {
 
 
   shared() async {
+
+    var urlImage = 'https://analisaaceh.com/wp-content/uploads/2020/06/Lidah-Buaya.jpg';
+
+    var response = await get(urlImage);
+    final documentDirectory = (await getExternalStorageDirectory()).path;
+    File imgFile = new File('$documentDirectory/tanaman_4.jpg');
+    imgFile.writeAsBytesSync(response.bodyBytes);
+
     final RenderBox box = context.findRenderObject();
-    Share.share('',
-        subject: '',
+    Share.shareFiles(['$documentDirectory/tanaman_4.jpg'],
+        text: 'my plant',
+        subject: 'xxx',
         sharePositionOrigin:
         box.localToGlobal(Offset.zero) &
         box.size);
@@ -128,9 +135,9 @@ class DetailScreenView extends DetailScreenViewModel {
     return Container(
       height: height * 0.4,
       child: Hero(
-        tag: 'assets/lidahbuaya.jpg',
+        tag: 'assets/tanaman_4.jpg',
         child: Image.asset(
-          'assets/lidahbuaya.jpg',
+          'assets/tanaman_4.jpg',
           fit: BoxFit.cover,
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:tanamind/helper/constant.dart';
 
 import 'detail_item_view_model.dart';
 
@@ -9,41 +10,56 @@ class DetailItem extends StatefulWidget {
   DetailItemView createState() => DetailItemView();
 }
 
-class DetailItemView extends DetailItemViewModel{
+class DetailItemView extends DetailItemViewModel {
   var size;
+
   @override
   Widget build(BuildContext context) {
-    size=MediaQuery.of(context).size;
+    size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
         children: [
-          Image.asset(item["image"],fit: BoxFit.cover,width: double.infinity,height: size.height/2,),
+          Image.asset(
+            item["image"],
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: size.height / 2,
+          ),
           _buildBottom()
         ],
       ),
     );
   }
 
-  Widget _buildListItem(){
+  Widget _buildListItem() {
     return Container(
       height: 300,
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: list_items.length,
-          itemBuilder: (context,index){
+          itemBuilder: (context, index) {
             return _buildRowItems(list_items[index]);
-          }
-      ),
+          }),
     );
   }
-  Widget _buildRowItems(data){
+
+  Widget _buildRowItems(data) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         //Navigator.pushNamed(context, "/detail_item");
       },
       child: Container(
         width: 180,
         margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.black38,
+                blurRadius: 2.0,
+              ),
+            ]),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,24 +69,46 @@ class DetailItemView extends DetailItemViewModel{
               height: 4,
             ),
             Container(
-              padding: EdgeInsets.all(5),
+              padding: EdgeInsets.all(6),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(data["name"],style: TextStyle(fontFamily: 'Montserrat',fontSize: 13),),
-                  SizedBox(height: 7,),
-                  Text(data["description"],style: TextStyle(fontFamily: 'Montserrat',fontSize: 13,color: Colors.grey),maxLines: 1,overflow: TextOverflow.ellipsis,),
-                  SizedBox(height: 7,),
-                  Text(data["price"],style: TextStyle(fontSize: 13,fontFamily: 'Roboto',color: Colors.green,fontWeight: FontWeight.bold),),
+                  Text(
+                    data["name"],
+                    style: TextStyle(fontFamily: 'Montserrat', fontSize: 13),
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Text(
+                    data["description"],
+                    style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 13,
+                        color: Colors.grey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(
+                    height: 7,
+                  ),
+                  Text(
+                    data["price"],
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontFamily: 'Roboto',
+                        color: mainGreen,
+                        fontWeight: FontWeight.bold),
+                  ),
                   SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       _buildAddCart()
                       // RaisedButton.icon(
-                      //     color: Colors.green,
+                      //     color: mainGreen,
                       //     textColor: Colors.white,
                       //     shape: RoundedRectangleBorder(
                       //       borderRadius: BorderRadius.all(Radius.circular(10))
@@ -86,74 +124,65 @@ class DetailItemView extends DetailItemViewModel{
             )
           ],
         ),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.black38,
-                blurRadius: 2.0,
-              ),
-            ]
-        ),
       ),
     );
   }
-  Widget _buildAddCart(){
+
+  Widget _buildAddCart() {
     return Container(
       padding: EdgeInsets.all(5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(Icons.shopping_basket,size: 20,color: Colors.white,),
-          SizedBox(width: 3,),
-          Text("Add To Cart",style: TextStyle(color: Colors.white,fontFamily: 'Montserrat',fontSize: 12,fontWeight: FontWeight.bold),)
-        ],
-      ),
       height: 30,
       decoration: BoxDecoration(
-          color: Colors.green,
+          color: mainGreen,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             new BoxShadow(
               color: Colors.black38,
               blurRadius: 2.0,
             ),
-          ]
+          ]),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.shopping_basket,
+            size: 20,
+            color: Colors.white,
+          ),
+          SizedBox(
+            width: 3,
+          ),
+          Text(
+            "Add To Cart",
+            style: TextStyle(
+                color: Colors.white,
+                fontFamily: 'Montserrat',
+                fontSize: 12,
+                fontWeight: FontWeight.bold),
+          )
+        ],
       ),
     );
   }
 
-
-  Widget _buildImage(String assets){
+  Widget _buildImage(String assets) {
     return Container(
       height: 150,
       decoration: BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(assets)
-          ),
+          image: DecorationImage(fit: BoxFit.cover, image: AssetImage(assets)),
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10)
-          )
-      ),
+              topLeft: Radius.circular(10), topRight: Radius.circular(10))),
     );
   }
 
-  Widget _buildBottom(){
+  Widget _buildBottom() {
     return DraggableScrollableSheet(
         initialChildSize: 0.6,
         minChildSize: 0.6,
         expand: true,
-        builder: (context,controller){
+        builder: (context, controller) {
           return Container(
-            child: ListView(
-              controller: controller,
-              children: [
-                _buildInfoItem()
-              ],
-            ),
+            padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
                 boxShadow: [
                   new BoxShadow(
@@ -164,14 +193,16 @@ class DetailItemView extends DetailItemViewModel{
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(10),
-                    topLeft: Radius.circular(10)
-                )
+                    topLeft: Radius.circular(10))),
+            child: ListView(
+              controller: controller,
+              children: [_buildInfoItem()],
             ),
           );
         });
   }
 
-  Widget _buildInfoItem(){
+  Widget _buildInfoItem() {
     return Container(
       padding: EdgeInsets.all(10),
       child: Column(
@@ -182,15 +213,25 @@ class DetailItemView extends DetailItemViewModel{
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(item["name"],style: TextStyle(fontFamily: 'Montserrat',fontSize: 15,fontWeight: FontWeight.bold),),
+              Text(
+                item["name"],
+                style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold),
+              ),
               Container(
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.green,
+                  color: mainGreen,
                 ),
                 child: Center(
-                  child: Icon(Icons.favorite,color: Colors.white,),
+                  child: Icon(
+                    Icons.favorite,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               )
             ],
@@ -198,19 +239,28 @@ class DetailItemView extends DetailItemViewModel{
           SizedBox(
             height: 5,
           ),
-          Text(item["description"],style: TextStyle(fontFamily: 'Montserrat',fontSize: 13,color: Colors.grey),),
+          Text(
+            item["description"],
+            style: TextStyle(
+                fontFamily: 'Montserrat', fontSize: 13, color: Colors.grey),
+          ),
           SizedBox(
             height: 10,
           ),
-          Text(item["price"],style: TextStyle(fontFamily: 'Montserrat',fontSize: 15,fontWeight: FontWeight.bold,color: Colors.green),),
+          Text(
+            item["price"],
+            style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: mainGreen),
+          ),
           SizedBox(
             height: 10,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _buildIncDe("0")
-            ],
+            children: [_buildIncDe("0")],
           ),
           SizedBox(
             height: 15,
@@ -220,14 +270,19 @@ class DetailItemView extends DetailItemViewModel{
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                child: Center(
-                  child: Text("Buy",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontFamily: "Montserrat"),),
-                ),
                 padding: EdgeInsets.all(10),
                 width: 140,
                 decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.all(Radius.circular(20))
+                    color: mainGreen,
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Center(
+                  child: Text(
+                    "Buy",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Montserrat"),
+                  ),
                 ),
               ),
               Container(
@@ -235,18 +290,29 @@ class DetailItemView extends DetailItemViewModel{
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.shopping_cart,color: Colors.white,),
-                      SizedBox(width: 4,),
-                      Text("Add To Cart",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontFamily: "Montserrat"),),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Text(
+                        "Add To Cart",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Montserrat"),
+                      ),
                     ],
                   ),
                 ),
                 padding: EdgeInsets.all(10),
                 width: 140,
                 decoration: BoxDecoration(
-                    color: Colors.green,
-                    borderRadius: BorderRadius.all(Radius.circular(20))
-                ),
+                    color: mainGreen,
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
               )
             ],
           ),
@@ -257,9 +323,17 @@ class DetailItemView extends DetailItemViewModel{
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.share,color: Colors.grey,),
-              SizedBox(width: 4,),
-              Text("Bagikan",style: TextStyle(fontFamily: "Montserrat",color: Colors.grey),)
+              Icon(
+                Icons.share,
+                color: Colors.grey,
+              ),
+              SizedBox(
+                width: 4,
+              ),
+              Text(
+                "Bagikan",
+                style: TextStyle(fontFamily: "Montserrat", color: Colors.grey),
+              )
             ],
           ),
           SizedBox(
@@ -270,8 +344,16 @@ class DetailItemView extends DetailItemViewModel{
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Rate",style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 14),),
-                SizedBox(height: 9,),
+                Text(
+                  "Rate",
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
+                ),
+                SizedBox(
+                  height: 9,
+                ),
                 SmoothStarRating(
                   isReadOnly: false,
                   allowHalfRating: true,
@@ -284,7 +366,11 @@ class DetailItemView extends DetailItemViewModel{
             height: 12,
           ),
           ListTile(
-            title: Text("Betram Gillfoyle",style: TextStyle(color: Colors.black,fontFamily: "Montserrat"),),
+            contentPadding: EdgeInsets.all(0),
+            title: Text(
+              "Betram Gillfoyle",
+              style: TextStyle(color: Colors.black, fontFamily: "Montserrat"),
+            ),
             subtitle: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,12 +378,17 @@ class DetailItemView extends DetailItemViewModel{
                 SizedBox(
                   height: 4,
                 ),
-                Text("Add a comment",style: TextStyle(color: Colors.grey,fontFamily: "Montserrat"),),
-                SizedBox(height: 4,),
+                Text(
+                  "Add a comment",
+                  style:
+                      TextStyle(color: Colors.grey, fontFamily: "Montserrat"),
+                ),
+                SizedBox(
+                  height: 4,
+                ),
                 Divider()
               ],
             ),
-            contentPadding: EdgeInsets.all(0),
             leading: CircleAvatar(
               backgroundImage: AssetImage("assets/dummy/gillfoyle.jpg"),
             ),
@@ -309,41 +400,68 @@ class DetailItemView extends DetailItemViewModel{
           SizedBox(
             height: 7,
           ),
-          Center(child: Text("Lihat semua komentar",style: TextStyle(fontFamily: "Montserrat",color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16),)),
+          Center(
+              child: Text(
+            "Lihat semua komentar",
+            style: TextStyle(
+                fontFamily: "Montserrat",
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 16),
+          )),
           SizedBox(
             height: 12,
           ),
-          Text("Produk yang sama",style: TextStyle(fontFamily: "Montserrat",color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16),),
+          Text(
+            "Produk yang sama",
+            style: TextStyle(
+                fontFamily: "Montserrat",
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 16),
+          ),
           SizedBox(
             height: 10,
           ),
           _buildListItem()
-
         ],
       ),
     );
   }
 
-  Widget _buildListComments(){
+  Widget _buildListComments() {
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       itemCount: list_comment.length,
-      itemBuilder: (context,index){
+      itemBuilder: (context, index) {
         return _buildRowComment(list_comment[index]);
       },
     );
   }
 
-  Widget _buildRowComment(var data){
+  Widget _buildRowComment(var data) {
     return Container(
       padding: EdgeInsets.all(5),
       margin: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.black38,
+              blurRadius: 2.0,
+            ),
+          ]),
       child: ListTile(
         leading: CircleAvatar(
           backgroundImage: AssetImage(data["image"]),
         ),
-        title: Text(data["name"],style: TextStyle(fontFamily: "Montserrat",fontWeight: FontWeight.bold),),
+        title: Text(
+          data["name"],
+          style:
+              TextStyle(fontFamily: "Montserrat", fontWeight: FontWeight.bold),
+        ),
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -356,48 +474,54 @@ class DetailItemView extends DetailItemViewModel{
             SizedBox(
               height: 4,
             ),
-            Text(data["comment"],style: TextStyle(fontFamily: "Montserrat",color: Colors.grey),),
+            Text(
+              data["comment"],
+              style: TextStyle(fontFamily: "Montserrat", color: Colors.grey),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildIncDe(String qty) {
+    return Container(
+      padding: EdgeInsets.all(7),
+      width: 80,
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: mainGreen,
           borderRadius: BorderRadius.all(Radius.circular(10)),
           boxShadow: [
             new BoxShadow(
               color: Colors.black38,
               blurRadius: 2.0,
             ),
-          ]
-      ),
-    );
-  }
-
-
-  Widget _buildIncDe(String qty){
-    return Container(
-      padding: EdgeInsets.all(7),
+          ]),
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.add,size: 20,color: Colors.white,),
-            Text(qty,style: TextStyle(color: Colors.white,fontFamily: 'Montserrat',fontSize: 16,fontWeight: FontWeight.bold),),
-            Icon(Icons.remove,size: 20,color: Colors.white,),
+            Icon(
+              Icons.add,
+              size: 20,
+              color: Colors.white,
+            ),
+            Text(
+              qty,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Montserrat',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
+            ),
+            Icon(
+              Icons.remove,
+              size: 20,
+              color: Colors.white,
+            ),
           ],
         ),
-      ),
-      width: 80,
-      decoration: BoxDecoration(
-          color: Colors.green,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black38,
-              blurRadius: 2.0,
-            ),
-          ]
       ),
     );
   }

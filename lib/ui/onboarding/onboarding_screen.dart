@@ -23,7 +23,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               titleTextStyle:
                   TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
               bodyTextStyle: TextStyle(fontSize: 19.0),
-              descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+              descriptionPadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              titlePadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
               pageColor: Colors.white,
               imagePadding: EdgeInsets.zero,
             )),
@@ -34,7 +35,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               titleTextStyle:
                   TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
               bodyTextStyle: TextStyle(fontSize: 19.0),
-              descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+              descriptionPadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              titlePadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
               pageColor: Colors.white,
               imagePadding: EdgeInsets.zero,
             )),
@@ -45,7 +47,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               titleTextStyle:
                   TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
               bodyTextStyle: TextStyle(fontSize: 19.0),
-              descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+              descriptionPadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+              titlePadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
               pageColor: Colors.white,
               imagePadding: EdgeInsets.zero,
             )),
@@ -56,11 +59,12 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             titleTextStyle:
                 TextStyle(fontSize: 28.0, fontWeight: FontWeight.w700),
             bodyTextStyle: TextStyle(fontSize: 19.0),
-            descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
+            descriptionPadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
+            titlePadding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 16.0),
             pageColor: Colors.white,
             imagePadding: EdgeInsets.zero,
           ),
-          footer: RaisedButton(
+          /*footer: RaisedButton(
             onPressed: () {
               introKey.currentState?.animateScroll(0);
             },
@@ -72,11 +76,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8)
             ),
-          ),
+          ),*/
         ),
       ],
       onDone: ()=> Navigator.of(context)
-          .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false),
+          .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false),
       showSkipButton: true,
       showNextButton: true,
       skipFlex: 0,

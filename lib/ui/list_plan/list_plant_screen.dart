@@ -40,12 +40,11 @@ class ListPlantView extends ListPlantViewModel {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildImage("assets/tips.jpg", 80, 80),
-          SizedBox(
-            width: 7,
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: _buildImage("assets/tips.jpg", 80, 80),
           ),
-          Container(
-            width: size.width * 0.5,
+          Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,114 +81,115 @@ class ListPlantView extends ListPlantViewModel {
   }
 
   Widget _buildRowPlants(var list, int index) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 15, left: 10, right: 10),
-      padding: EdgeInsets.all(13),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black38,
-              blurRadius: 2.0,
-            ),
-          ]),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildImage(list[index]["image"], 80, 80),
-              SizedBox(
-                width: 7,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15, left: 16, right: 16),
+      child: Container(
+        padding: EdgeInsets.all(13),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.black38,
+                blurRadius: 2.0,
               ),
-              Container(
-                width: size.width * 0.5,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      list[index]["name"],
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Roboto",
-                          fontSize: 16),
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          list[index]["type"],
-                          style:
-                              TextStyle(fontFamily: "Montserrat", fontSize: 15),
-                        ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        DotsIndicator(
-                          dotsCount: 1,
-                          position: 0,
-                          decorator: DotsDecorator(
-                            activeSize: const Size(8.0, 8.0),
-                            activeColor: Colors.grey,
-                            color: Colors.grey,
+            ]),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: _buildImage(list[index]["image"], 80, 80),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        list[index]["name"],
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Roboto",
+                            fontSize: 16),
+                      ),
+                      SizedBox(
+                        height: 4,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            list[index]["type"],
+                            style:
+                                TextStyle(fontFamily: "Montserrat", fontSize: 15),
                           ),
-                        ),
-                        Text(
-                          list[index]["task_count"] + " Tasks",
-                          style:
-                              TextStyle(fontFamily: "Montserrat", fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 3,
-          ),
-          Divider(),
-          SizedBox(
-            height: 3,
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: list[index]["task_detail"].map<Widget>((e) {
-              return CheckboxListTile(
-                title: Text(
-                  e,
-                  style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      fontSize: 15),
-                ),
-                selected: false,
-                value: false,
-              );
-            }).toList(),
-          ),
-          SizedBox(
-            height: 3,
-          ),
-          Text(
-            list[index]["note"],
-            style: TextStyle(
-              fontFamily: "Montserrat",
-              fontSize: 15,
+                          SizedBox(
+                            width: 4,
+                          ),
+                          DotsIndicator(
+                            dotsCount: 1,
+                            position: 0,
+                            decorator: DotsDecorator(
+                              activeSize: const Size(8.0, 8.0),
+                              activeColor: Colors.grey,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            list[index]["task_count"] + " Tasks",
+                            style:
+                                TextStyle(fontFamily: "Montserrat", fontSize: 15),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
-          ),
-        ],
+            SizedBox(
+              height: 3,
+            ),
+            Divider(),
+            SizedBox(
+              height: 3,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: list[index]["task_detail"].map<Widget>((e) {
+                return CheckboxListTile(
+                  title: Text(
+                    e,
+                    style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: 15),
+                  ),
+                  selected: false,
+                  value: false,
+                );
+              }).toList(),
+            ),
+            SizedBox(
+              height: 3,
+            ),
+            Text(
+              list[index]["note"],
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

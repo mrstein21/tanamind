@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/ui/home/home_view_model.dart';
+
+import 'bottom_navbar_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key key, this.title}) : super(key: key);
@@ -12,58 +16,20 @@ class HomeScreen extends StatefulWidget {
   HomeScreenView createState() => HomeScreenView();
 }
 
-class HomeScreenView extends HomeViewModel with TickerProviderStateMixin {
-  AnimationController _hideFabAnimation;
+class HomeScreenView extends HomeViewModel {
 
   bool isCollapse = true;
+  var fSize;
   var size;
   var screenWidth;
   var screenHeight;
   int index = 0;
   final Duration duration = const Duration(milliseconds: 300);
 
-  void onTabTapped(int index) {
+  void _selectedTab(int index) {
     setState(() {
       this.index = index;
     });
-  }
-
-  @override
-  initState() {
-    super.initState();
-    _hideFabAnimation =
-        AnimationController(vsync: this, duration: kThemeAnimationDuration);
-  }
-
-  @override
-  void dispose() {
-    _hideFabAnimation.dispose();
-    super.dispose();
-  }
-
-  bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification.depth == 0) {
-      if (notification is UserScrollNotification) {
-        final UserScrollNotification userScroll = notification;
-        switch (userScroll.direction) {
-          case ScrollDirection.forward:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
-              _hideFabAnimation.forward();
-            }
-            break;
-          case ScrollDirection.reverse:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
-              _hideFabAnimation.reverse();
-            }
-            break;
-          case ScrollDirection.idle:
-            break;
-        }
-      }
-    }
-    return false;
   }
 
   @override
@@ -72,8 +38,19 @@ class HomeScreenView extends HomeViewModel with TickerProviderStateMixin {
     screenHeight = size.height;
     screenWidth = size.width;
 
+    if(screenHeight < 672 && screenWidth < 360){
+      fSize = 9.0;
+      print('font size $fSize and screen size is $screenHeight');
+    }else if(screenHeight >= 672 && screenHeight < 799) {
+      fSize = 12.0;
+      print('font size $fSize and screen size is $screenHeight');
+    }else if(screenHeight > 799){
+      fSize = 14.0;
+      print('font size $fSize and screen size is $screenHeight');
+    }
+
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: mainGreen,
       body: Stack(
         children: [_buildMenu(), _buildDashboard()],
       ),
@@ -258,10 +235,18 @@ class HomeScreenView extends HomeViewModel with TickerProviderStateMixin {
                 SizedBox(
                   width: 10,
                 ),
-                Text(
-                  "Logout",
-                  style:
-                      TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                InkWell(
+                  onTap: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false),
+                  child: Container(
+                    width: 100,
+                    padding: EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      "Logout",
+                      style:
+                          TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -271,7 +256,7 @@ class HomeScreenView extends HomeViewModel with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildDashboard() {
+  Widget _buildDashboard(){
     return AnimatedPositioned(
       duration: duration,
       top: isCollapse ? 0 : 0.1 * screenHeight,
@@ -284,104 +269,74 @@ class HomeScreenView extends HomeViewModel with TickerProviderStateMixin {
         color: Colors.white,
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(10)),
-          child: NotificationListener<ScrollNotification>(
-            onNotification: _handleScrollNotification,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: InkWell(
-                  onTap: () {
-                    setState(() {
-                      isCollapse = !isCollapse;
-                    });
-                  },
-                  child: Icon(
-                    Icons.menu,
-                    color: Colors.white,
-                  ),
-                ),
-                title: Text("Tanaminds"),
-              ),
-              body: children[index]["page"],
-              extendBody: true,
-              floatingActionButton: ScaleTransition(
-                scale: _hideFabAnimation,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/cart");
-                  },
-                  child: Icon(
-                    Icons.shopping_basket,
-                    color: Colors.white,
-                  ),
+          child: Scaffold(
+            appBar: AppBar(
+              backgroundColor: mainGreen,
+              leading: InkWell(
+                onTap: () {
+                  setState(() {
+                    isCollapse = !isCollapse;
+                  });
+                },
+                child: Icon(
+                  Icons.menu,
+                  color: Colors.white,
                 ),
               ),
-              bottomNavigationBar: NotificationListener<ScrollNotification>(
-                onNotification: _handleScrollNotification,
-                child: ScaleTransition(
-                  scale: _hideFabAnimation,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(),
-                    child: Container(
-                      decoration: BoxDecoration(boxShadow: [
-                        new BoxShadow(
-                          color: Colors.black38,
-                          blurRadius: 2.0,
-                        ),
-                      ], borderRadius: BorderRadius.all(Radius.circular(15))),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(15)),
-                        child: BottomNavigationBar(
-                          onTap: onTabTapped,
-                          currentIndex: index,
-                          selectedFontSize: 12,
-                          unselectedFontSize: 12,
-                          backgroundColor: Colors.white,
-                          selectedItemColor: children[index]['selectedColor'],
-                          unselectedItemColor: children[index]
-                              ['unSelectedColor'],
-                          items: [
-                            BottomNavigationBarItem(
-                              icon: new Icon(
-                                Icons.notifications,
-                                size: 40,
-                              ),
-                              title: Text(
-                                '${children[0]['name']}',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            BottomNavigationBarItem(
-                              icon: new Icon(
-                                Icons.store,
-                                size: 40,
-                              ),
-                              title: Text(
-                                '${children[1]['name']}',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                            BottomNavigationBarItem(
-                              icon: new Icon(
-                                Icons.shopping_basket,
-                                size: 40,
-                              ),
-                              title: Text(
-                                '${children[2]['name']}',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+              /*title: children[index]['name'] == 'Reminder' ||
+                  children[index]['name'] == 'Market'
+                  ? _titleStyle('Tanamind')
+                  : children[index]['name'] == 'Tanamanku'
+                  ? _titleStyle('My Plant')
+                  : _titleStyle('Profile'),*/
+              title: _titleStyle('Tanamind'),
+            ),
+            body: children[index]["page"],
+            extendBody: true,
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: FloatingActionButton(
+              mini: true,
+              backgroundColor: mainGreen,
+              onPressed: () {
+                if (children[index]["name"] == 'Tanamanku')
+                  Navigator.pushNamed(context, "/add_pot");
+                else
+                  setState(() {
+                    this.index = 2;
+                  });
+              },
+              child: Icon(
+                children[index]["name"] == 'Tanamanku'
+                    ? Icons.add
+                    : Icons.shopping_basket,
+                color: Colors.white,
               ),
+            ),
+            bottomNavigationBar:FABBottomAppBar(
+              color: Colors.grey,
+              selectedColor: children[index]['selectedColor'],
+              notchedShape: CircularNotchedRectangle(),
+              onTabSelected: _selectedTab,
+              items: [
+                FABBottomAppBarItem(iconData: Icons.notifications, text: 'Reminder', fSize: fSize),
+                FABBottomAppBarItem(iconData: Icons.store, text: 'Tanamanku', fSize: fSize),
+                FABBottomAppBarItem(iconData: Icons.shopping_basket, text: 'Market', fSize: fSize),
+                FABBottomAppBarItem(iconData: Icons.account_circle, text: 'Akun', fSize: fSize),
+              ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _titleStyle(String title){
+    TextStyle _style = GoogleFonts.courgette(
+      fontSize: 14.0,
+      fontWeight: FontWeight.w500,
+      color: Colors.white
+    );
+
+    return Text(title, style: _style, textScaleFactor: 1.5,);
   }
 }

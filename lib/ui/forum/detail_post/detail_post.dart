@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tanamind/helper/constant.dart';
 import 'detail_post_view_model.dart';
 
 class DetailPost extends StatefulWidget{
@@ -13,6 +14,7 @@ class DetailPostView extends DetailPostViewModel {
     return Scaffold(
       appBar: AppBar(
         title: Text("View Post"),
+        backgroundColor: mainGreen,
       ),
       body: Container(
         color: Colors.white,
@@ -39,7 +41,7 @@ class DetailPostView extends DetailPostViewModel {
           ],
         ),
       ),
-    ); // TODO: implement build
+    );
   }
 
   Widget _buildListAnswer() {
