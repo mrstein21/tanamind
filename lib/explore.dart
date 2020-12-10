@@ -255,7 +255,8 @@ class _ExploreUIState extends State<ExploreUI> {
                     children: [
                       Text(
                         'Do you have an account?',
-                        style: fontRoboto(15.0, FontWeight.w600, Colors.black54),
+                        style:
+                            fontRoboto(15.0, FontWeight.w600, Colors.black54),
                       ),
                       SizedBox(
                         width: 8,

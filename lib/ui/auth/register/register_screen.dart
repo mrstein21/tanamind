@@ -1,35 +1,64 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/cubit/auth/register/register_cubit.dart';
+import 'package:tanamind/cubit/auth/register/register_state.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/helper/validator.dart';
+import 'package:tanamind/ui/auth/register/register_view_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  RegisterViewScreen createState() => RegisterViewScreen();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class RegisterViewScreen extends RegisterViewModel {
   Size size;
+  final formKey = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController _email = new TextEditingController();
+  TextEditingController _firstName = new TextEditingController();
+  TextEditingController _lastName = new TextEditingController();
+  TextEditingController _phone = new TextEditingController();
+  TextEditingController _password = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
       resizeToAvoidBottomPadding: false,
-      body: Stack(
-        children: [
-          _buildBackground(size.height * 0.4, size.width),
-          _buildTitle(size.height * 0.15),
-          _buildFormCard(
-              size.height * 0.4, size.width * 0.9, size.height * 0.25),
-          _buildButtonLogin(size.height * 0.63),
-          _buildRegister(),
-          _buildRowFbAndGoogle(size.height * 0.15),
-          _buildCircleTop(),
-          _buildCircleBottom()
-        ],
+      body: BlocListener<RegisterCubit, RegisterState>(
+        listener: (context, state) {
+          if(state is IsLoadingState){
+            loadingDialog(context);
+          }else if(state is IsLoadedState){
+            print('Success state ${state.response}');
+            Navigator.pop(context,false);
+            final snackBar = SnackBar(content: Text('${state.response}'));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+          }else if(state is IsErrorState){
+            Navigator.pop(context,false);
+            final snackBar = SnackBar(content: Text('Failed...'));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+          }
+        },
+        child: Stack(
+          children: [
+            _buildBackground(size.height * 0.4, size.width),
+            _buildTitle(size.height * 0.15),
+            _buildFormCard(
+                size.height * 0.45, size.width * 0.9, size.height * 0.25),
+            _buildButtonLogin(size.height * 0.65),
+            _buildRegister(),
+            _buildRowFbAndGoogle(size.height * 0.13),
+            _buildCircleTop(),
+            _buildCircleBottom()
+          ],
+        ),
       ),
     );
   }
@@ -37,30 +66,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _buildBackground(double height, double width) {
     return Positioned(
         child: Column(
+      children: [
+        Stack(
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: height,
-                  width: width,
-                  child: CustomPaint(
-                    painter: CurvePainter(),
-                  ),
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height / 2.5,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.black45.withOpacity(0),
-                )
-              ],
-            ),
-            Expanded(
-              child: Container(
-                color: Colors.white,
+            Container(
+              height: height,
+              width: width,
+              child: CustomPaint(
+                painter: CurvePainter(),
               ),
             ),
+            Container(
+              height: MediaQuery.of(context).size.height / 2.5,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black45.withOpacity(0),
+            )
           ],
-        ));
+        ),
+        Expanded(
+          child: Container(
+            color: Colors.white,
+          ),
+        ),
+      ],
+    ));
   }
 
   Widget _buildTitle(double height) {
@@ -99,16 +128,78 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ]),
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Form(
+              key: formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        flex: 1,
+                        child: TextFormField(
+                          controller: _firstName,
+                          style: TextStyle(fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: 'Firstname',
+                            errorStyle: TextStyle(fontSize: 0),
+                            hintStyle: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w500, fontSize: 14),
+                            isDense: true,
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    BorderSide(color: mainGreen, width: 1)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide:
+                                  BorderSide(color: mainGreen, width: 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: TextFormField(
+                          controller: _lastName,
+                          style: TextStyle(fontSize: 16),
+                          decoration: InputDecoration(
+                            hintText: 'Lastname',
+                            errorStyle: TextStyle(fontSize: 0),
+                            hintStyle: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.w500, fontSize: 14),
+                            isDense: true,
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide:
+                                    BorderSide(color: mainGreen, width: 1)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide:
+                                  BorderSide(color: mainGreen, width: 2),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 16,
+                  ),
                   TextFormField(
+                    controller: _email,
                     validator: (value) => emailValidator(value),
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 16),
+                    keyboardType: TextInputType.emailAddress,
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(10),
+                    ],
                     decoration: InputDecoration(
-                      hintText: 'Firstname',
+                      hintText: 'Email',
+                      errorStyle: TextStyle(fontSize: 0),
                       hintStyle: GoogleFonts.montserrat(
                           fontWeight: FontWeight.w500, fontSize: 14),
                       isDense: true,
@@ -125,30 +216,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 16,
                   ),
                   TextFormField(
-                    validator: (value) => emailValidator(value),
-                    style: TextStyle(fontSize: 20),
-                    decoration: InputDecoration(
-                      hintText: 'Lastname',
-                      hintStyle: GoogleFonts.montserrat(
-                          fontWeight: FontWeight.w500, fontSize: 14),
-                      isDense: true,
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: mainGreen, width: 1)),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: mainGreen, width: 2),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  TextFormField(
-                    validator: (value) => emailValidator(value),
-                    style: TextStyle(fontSize: 20),
+                    controller: _phone,
+                    validator: (value) => phoneValidator(value),
+                    keyboardType: TextInputType.phone,
+                    style: TextStyle(fontSize: 16),
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     decoration: InputDecoration(
                       hintText: 'Phone Number',
+                      errorStyle: TextStyle(fontSize: 0),
                       hintStyle: GoogleFonts.montserrat(
                           fontWeight: FontWeight.w500, fontSize: 14),
                       isDense: true,
@@ -165,13 +240,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 16,
                   ),
                   TextFormField(
+                    controller: _password,
                     validator: (value) => passwordValidator(value),
-                    style: TextStyle(fontSize: 20),
+                    style: TextStyle(fontSize: 16),
                     decoration: InputDecoration(
                         hintText: 'Password',
+                        errorStyle: TextStyle(fontSize: 0, height: 0),
                         hintStyle: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500, fontSize: 14),
                         isDense: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(color: mainGreen, width: 1)),
@@ -194,8 +273,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       right: 100,
       left: 100,
       child: InkWell(
-        onTap: () => Navigator.of(context)
-            .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false),
+        onTap: () {
+          var phoneNumber = _phone.text.replaceFirst('0', '62');
+          if (!formKey.currentState.validate()) {
+            final snackBar =
+                SnackBar(content: Text('Please enter correct data...'));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+          } else {
+            onButtonPressed(_firstName.text, _lastName.text, _email.text,
+                _password.text, phoneNumber);
+          }
+        },
         child: Container(
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -228,14 +316,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       Text(
                         'Already have an account?',
                         style:
-                        fontRoboto(15.0, FontWeight.w600, Colors.black54),
+                            fontRoboto(15.0, FontWeight.w600, Colors.black54),
                       ),
                       SizedBox(
                         width: 8,
                       ),
                       InkWell(
                         onTap: () => Navigator.of(context)
-                            .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false),
+                            .pushNamedAndRemoveUntil(
+                                '/login', (Route<dynamic> route) => false),
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 8),
                           child: Text(
@@ -363,7 +452,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
     );
   }
-
 }
 
 class TopWaveClipper extends CustomClipper<Path> {
@@ -385,7 +473,7 @@ class TopWaveClipper extends CustomClipper<Path> {
         secondEndPoint.dx, secondEndPoint.dy);
 
     var thirdControlPoint =
-    Offset(size.width - (size.width / 9), size.height / 6);
+        Offset(size.width - (size.width / 9), size.height / 6);
     var thirdEndPoint = Offset(size.width, 0.0);
     path.quadraticBezierTo(thirdControlPoint.dx, thirdControlPoint.dy,
         thirdEndPoint.dx, thirdEndPoint.dy);
