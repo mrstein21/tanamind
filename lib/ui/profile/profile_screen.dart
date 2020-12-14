@@ -13,6 +13,12 @@ class ProfileView extends ProfileViewModel {
   Size size;
 
   @override
+  void initState() {
+    getUserPreferencess();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
@@ -34,10 +40,18 @@ class ProfileView extends ProfileViewModel {
           height: 50,
           width: 50,
           child: CircleAvatar(
-            backgroundImage: AssetImage('assets/dummy/richard.jpg'),
+            child: Text(
+              userInitial ?? "U",
+              style: TextStyle(
+                  fontFamily: "Roboto",
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
+            ),
+            /*backgroundImage: AssetImage('assets/dummy/richard.jpg'),*/
           )),
       title: Text(
-        'Richard',
+        userName ??
+            'Richard',
         style: GoogleFonts.roboto(),
       ),
       subtitle: InkWell(

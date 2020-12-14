@@ -13,23 +13,34 @@ class RegisterCubit extends Cubit<RegisterState> {
       String password, var phone) async {
     try {
       emit(IsLoadingState());
+      await Future.delayed(new Duration(seconds: 3));
       var response = await RegisterRepository()
           .sentData(firstName, lastName, email, password, phone);
       var json = jsonDecode(response);
-      if(json['status'] == 201){
+      if (json['status'] == 201) {
         var data = json['data'];
         UserModel.fromJson(data);
+        var username = data['user']['firstname'] + data['user']['lastname'];
         UserPreferences.setUserToken(data['token']);
         UserPreferences.setUserEmail(data['user']['email']);
-        UserPreferences.setUserName(data['user']['firstname'], data['user']['lastname']);
+        UserPreferences.setUserName(username);
         UserPreferences.setUserPhone(data['user']['phone']);
         emit(IsLoadedState(json['status']));
-      }else {
-        emit(IsErrorState(json));
+      } else if (json['status'] == 400) {
+        var data = json['error'];
+        var message;
+        if (data['email'] != null && data['phone'] != null) {
+          message = 'Email and Phone number has already been taken.';
+        } else if (data['email'] != null) {
+          message = 'Email has already been taken.';
+        } else if (data['phone'] != null) {
+          message = 'Phone number has already been taken.';
+        }
+        emit(IsErrorState('$message'));
       }
     } catch (e) {
       print("print error : $e");
-      emit(IsErrorState(e.toString()));
+      emit(IsErrorState('Connection error...'));
     }
   }
 }

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:tanamind/cubit/marketplace/promo/promo_cubit.dart';
+import 'package:tanamind/cubit/marketplace/promo/promo_state.dart';
 import 'package:tanamind/helper/style.dart';
+import 'package:tanamind/model/marketplace_model/promo_model.dart';
 import 'package:tanamind/ui/marketplace/marketplace/marketplace_view_model.dart';
 
 class ListPromotion extends StatefulWidget {
@@ -12,9 +17,11 @@ class _buildListPromotion extends ListPromotionModel {
   var size;
   PageController _pageController;
   int _currentSlide = 0;
+  PromotionCubit cubit;
 
   @override
   void initState() {
+    cubit = BlocProvider.of<PromotionCubit>(context);
     _pageController = PageController(
         initialPage: _currentSlide, keepPage: false, viewportFraction: 0.9);
     super.initState();
@@ -23,17 +30,46 @@ class _buildListPromotion extends ListPromotionModel {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    return Container(
-      height: size.height * 0.2,
-      child: PageView.builder(
-        controller: _pageController,
-        itemCount: promo.length,
-        scrollDirection: Axis.horizontal,
-        itemBuilder: (context, index) {
-          /*return _buildCard(promo[index]);*/
-          return _buildCardBezier(promo[index]);
-        },
-      ),
+    return BlocBuilder<PromotionCubit, MarketplacePromotionState>(
+        // ignore: missing_return
+        builder: (context, state) {
+      if (state is PromotionIsLoading) {
+        return _buildLoading(size);
+      } else if (state is PromotionIsLoaded) {
+        return Container(
+          height: size.height * 0.2,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: state.list.length,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return _buildCardBezier(state.list[index]);
+            },
+          ),
+        );
+      } else if (state is PromotionIsError) {
+        return _buildCard(state.message);
+      }
+    });
+  }
+
+  Widget _buildLoading(Size size){
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          padding: const EdgeInsets.all(8.0),
+          height: size.height * 0.2,
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey[300],
+            highlightColor: Colors.grey[100],
+            child: Container(
+              height: size.height * 0.2,
+              width: double.infinity,
+              color: Colors.white,
+              margin: EdgeInsets.symmetric(horizontal: 8),
+            ),
+          ),
+        )
     );
   }
 
@@ -41,7 +77,9 @@ class _buildListPromotion extends ListPromotionModel {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
+        alignment: Alignment.center,
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
           color: Colors.white,
           boxShadow: [
             new BoxShadow(
@@ -49,17 +87,17 @@ class _buildListPromotion extends ListPromotionModel {
               blurRadius: 2.0,
             ),
           ],
-          image: DecorationImage(
+          /*image: DecorationImage(
             image: AssetImage(assets),
             fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(10),
+          ),*/
         ),
+        child: Text('$assets'),
       ),
     );
   }
 
-  Widget _buildCardBezier(String data) {
+  Widget _buildCardBezier(MarketplacePromotionModel data) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -95,7 +133,7 @@ class _buildListPromotion extends ListPromotionModel {
                     bottomRight: Radius.circular(6),
                   ),
                   child: Image.asset(
-                    data,
+                    'assets/dummy/promo1.jpg',
                     fit: BoxFit.fitHeight,
                   ),
                 ),
@@ -121,7 +159,8 @@ class _buildListPromotion extends ListPromotionModel {
                       constraints: BoxConstraints(
                           maxWidth: MediaQuery.of(context).size.width * 4 / 15),
                       child: Text(
-                        'Lorem ipsum dolor sit amet',
+                        /*'Lorem ipsum dolor sit amet',*/
+                        '${data.title}',
                         softWrap: true,
                         style:
                             fontRoboto(15.0, FontWeight.w500, Colors.black45),

@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:tanamind/helper/base_url.dart';
-import 'package:tanamind/model/auth_model/user_model.dart';
 
 class RegisterRepository {
   Future sentData(String firstName, String lastName, String email,
@@ -19,11 +16,13 @@ class RegisterRepository {
       'password': password
     });
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      print('repository : ${response.body}');
       return response.body;
     } else if(response.statusCode == 400){
       return response.body;
     }else{
+      print('${response.body} + ${response.statusCode}');
       throw Exception();
     }
   }

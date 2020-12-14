@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/cubit/kelola/plant_category_cubit.dart';
+import 'package:tanamind/cubit/kelola/plant_category_state.dart';
 import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
+import 'package:tanamind/model/kelola_model/plant_model.dart';
 import 'package:tanamind/ui/kelola/kelola/kelola_view_model.dart';
 
 class KelolaScreen extends StatefulWidget {
@@ -16,6 +20,14 @@ class KelolaViewScreen extends KelolaViewModel {
   double _animatedWidth = 0;
   var _selectedIndex;
   var _selectedIndexRight;
+
+  PlantCategoryCubit cubit;
+
+  @override
+  void initState() {
+    cubit = BlocProvider.of<PlantCategoryCubit>(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +64,13 @@ class KelolaViewScreen extends KelolaViewModel {
               ],
             ),
           ),
-          _buildFilterRight()
+          /*_buildFilterRight()*/
         ],
       ),
     );
   }
 
-  Widget _buildFilterRight() {
+  /*Widget _buildFilterRight() {
     return AnimatedContainer(
       width: _animatedWidth,
       duration: Duration(milliseconds: 450),
@@ -100,7 +112,7 @@ class KelolaViewScreen extends KelolaViewModel {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _buildSearch() {
     return Padding(
@@ -125,7 +137,10 @@ class KelolaViewScreen extends KelolaViewModel {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.black26,),
+                  Icon(
+                    Icons.search,
+                    color: Colors.black26,
+                  ),
                   Expanded(
                     child: TextField(
                       decoration: InputDecoration(
@@ -168,29 +183,45 @@ class KelolaViewScreen extends KelolaViewModel {
   }
 
   Widget _buildFilter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: listFilter.map((e) {
-        return InkWell(
-          onTap: () {
-            setState(() {
-              _selectedIndex = e;
-            });
-          },
-          child: Container(
-            alignment: Alignment.center,
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            decoration: BoxDecoration(
-              color: _selectedIndex == e ? mainGreen : Color(0xff81af8a),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '$e',
-              style: fontMonsserat(14.0, FontWeight.w500, Colors.white),
-            ),
-          ),
-        );
-      }).toList(),
+    return BlocBuilder<PlantCategoryCubit, PlantCategoryState>(
+      // ignore: missing_return
+      builder: (context, state) {
+        if (state is InitialState) {
+          return Container();
+        } else if (state is CategoryIsLoaded) {
+          List<PlantCategoryModel> category = new List();
+          category = state.list;
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: category.map((e) {
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedIndex = e.name;
+                  });
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: _selectedIndex == e.name
+                        ? mainGreen
+                        : Color(0xff81af8a),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${e.name}',
+                    style: fontMonsserat(14.0, FontWeight.w500, Colors.white),
+                  ),
+                ),
+              );
+            }).toList(),
+          );
+        } else if (state is CategoryIsError) {
+          print('error state : ${state.message}');
+          return Container();
+        }
+      },
     );
   }
 

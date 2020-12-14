@@ -8,6 +8,13 @@ import 'package:tanamind/ui/auth/register/register_screen.dart';
 abstract class RegisterViewModel extends State<RegisterScreen> {
   RegisterCubit cubit;
   SharedPreferences sharedPreferences;
+  final formKey = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController email = new TextEditingController();
+  TextEditingController firstName = new TextEditingController();
+  TextEditingController lastName = new TextEditingController();
+  TextEditingController phone = new TextEditingController();
+  TextEditingController password = new TextEditingController();
 
   @override
   void initState() {
@@ -15,9 +22,19 @@ abstract class RegisterViewModel extends State<RegisterScreen> {
     super.initState();
   }
 
-  void onButtonPressed(String firstName, String lastName, String email,
-      String password, var phone) async {
-    cubit.register(firstName, lastName, email, password, phone);
+  void onButtonPressed() async {
+    var phoneNumber = phone.text.replaceFirst('0', '62');
+    if (!formKey.currentState.validate()) {
+      final snackBar = SnackBar(content: Text('Please enter correct data...'));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    } else if (lastName.text == firstName.text) {
+      final snackBar =
+          SnackBar(content: Text('Lastname cannot be same as Firstname'));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    } else {
+      cubit.register(firstName.text, lastName.text, email.text, password.text,
+          phoneNumber);
+    }
   }
 
   //loading widget

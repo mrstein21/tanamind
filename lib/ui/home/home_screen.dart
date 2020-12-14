@@ -17,7 +17,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenView extends HomeViewModel {
-
   bool isCollapse = true;
   var fSize;
   var size;
@@ -33,23 +32,30 @@ class HomeScreenView extends HomeViewModel {
   }
 
   @override
+  void initState() {
+    getUserPreferencess();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     screenHeight = size.height;
     screenWidth = size.width;
 
-    if(screenHeight < 672 && screenWidth < 360){
+    if (screenHeight < 672 && screenWidth < 360) {
       fSize = 9.0;
       print('font size $fSize and screen size is $screenHeight');
-    }else if(screenHeight >= 672 && screenHeight < 799) {
+    } else if (screenHeight >= 672 && screenHeight < 799) {
       fSize = 12.0;
       print('font size $fSize and screen size is $screenHeight');
-    }else if(screenHeight > 799){
+    } else if (screenHeight > 799) {
       fSize = 14.0;
       print('font size $fSize and screen size is $screenHeight');
     }
 
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: mainGreen,
       body: Stack(
         children: [_buildMenu(), _buildDashboard()],
@@ -58,6 +64,7 @@ class HomeScreenView extends HomeViewModel {
   }
 
   Widget _buildMenu() {
+    print('user name : $userName');
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Align(
@@ -74,17 +81,24 @@ class HomeScreenView extends HomeViewModel {
               children: [
                 CircleAvatar(
                   backgroundColor: Colors.white,
-                  radius: 55,
+                  radius: 45,
                   child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage("assets/dummy/gillfoyle.jpg"),
+                    radius: 40,
+                    /*backgroundImage: AssetImage("assets/dummy/gillfoyle.jpg"),*/
+                    child: Text(
+                      userName != null ? '${userName[0]}'.toUpperCase() : '',
+                      style: GoogleFonts.roboto(
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
                   ),
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 Text(
-                  "Betram GillFoyle",
+                  userInitial ?? "Betram GillFoyle",
                   style: TextStyle(
                       fontFamily: "Roboto",
                       color: Colors.white,
@@ -120,9 +134,6 @@ class HomeScreenView extends HomeViewModel {
                     ),
                   ),
                 ),
-                /*SizedBox(
-                  height: 10,
-                ),*/
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: InkWell(
@@ -236,15 +247,14 @@ class HomeScreenView extends HomeViewModel {
                   width: 10,
                 ),
                 InkWell(
-                  onTap: () => Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false),
+                  onTap: logOut,
                   child: Container(
                     width: 100,
                     padding: EdgeInsets.symmetric(vertical: 4.0),
                     child: Text(
                       "Logout",
-                      style:
-                          TextStyle(color: Colors.white, fontFamily: 'Montserrat'),
+                      style: TextStyle(
+                          color: Colors.white, fontFamily: 'Montserrat'),
                     ),
                   ),
                 ),
@@ -256,7 +266,7 @@ class HomeScreenView extends HomeViewModel {
     );
   }
 
-  Widget _buildDashboard(){
+  Widget _buildDashboard() {
     return AnimatedPositioned(
       duration: duration,
       top: isCollapse ? 0 : 0.1 * screenHeight,
@@ -293,7 +303,8 @@ class HomeScreenView extends HomeViewModel {
             ),
             body: children[index]["page"],
             extendBody: true,
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
             floatingActionButton: FloatingActionButton(
               mini: true,
               backgroundColor: mainGreen,
@@ -312,16 +323,26 @@ class HomeScreenView extends HomeViewModel {
                 color: Colors.white,
               ),
             ),
-            bottomNavigationBar:FABBottomAppBar(
+            bottomNavigationBar: FABBottomAppBar(
               color: Colors.grey,
               selectedColor: children[index]['selectedColor'],
               notchedShape: CircularNotchedRectangle(),
               onTabSelected: _selectedTab,
               items: [
-                FABBottomAppBarItem(iconData: Icons.notifications, text: 'Reminder', fSize: fSize),
-                FABBottomAppBarItem(iconData: Icons.store, text: 'Tanamanku', fSize: fSize),
-                FABBottomAppBarItem(iconData: Icons.shopping_basket, text: 'Market', fSize: fSize),
-                FABBottomAppBarItem(iconData: Icons.account_circle, text: 'Akun', fSize: fSize),
+                FABBottomAppBarItem(
+                    iconData: Icons.notifications,
+                    text: 'Reminder',
+                    fSize: fSize),
+                FABBottomAppBarItem(
+                    iconData: Icons.store, text: 'Tanamanku', fSize: fSize),
+                FABBottomAppBarItem(
+                    iconData: Icons.shopping_basket,
+                    text: 'Market',
+                    fSize: fSize),
+                FABBottomAppBarItem(
+                    iconData: Icons.account_circle,
+                    text: 'Akun',
+                    fSize: fSize),
               ],
             ),
           ),
@@ -330,13 +351,14 @@ class HomeScreenView extends HomeViewModel {
     );
   }
 
-  Widget _titleStyle(String title){
+  Widget _titleStyle(String title) {
     TextStyle _style = GoogleFonts.courgette(
-      fontSize: 14.0,
-      fontWeight: FontWeight.w500,
-      color: Colors.white
-    );
+        fontSize: 14.0, fontWeight: FontWeight.w500, color: Colors.white);
 
-    return Text(title, style: _style, textScaleFactor: 1.5,);
+    return Text(
+      title,
+      style: _style,
+      textScaleFactor: 1.5,
+    );
   }
 }

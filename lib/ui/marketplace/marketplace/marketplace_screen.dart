@@ -5,6 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/ui/marketplace/marketplace/build_list_recomendation.dart';
 import 'package:tanamind/ui/marketplace/marketplace/build_list_promotion.dart';
+import 'package:tanamind/ui/marketplace/marketplace/category/build_list_category.dart';
 import 'package:tanamind/ui/marketplace/marketplace/marketplace_view_model.dart';
 
 class MarketPlaceScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class MarketPlaceView extends MarketPlaceViewModel {
             SizedBox(
               height: 2,
             ),
-            _buildListCategory(),
+            ListCategory(),
             SizedBox(
               height: 2,
             ),
@@ -228,64 +229,7 @@ class MarketPlaceView extends MarketPlaceViewModel {
     );
   }
 
-  Widget _buildListCategory() {
-    return Container(
-      height: 90,
-      child: ListView.builder(
-          itemCount: category.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return InkWell(
-                onTap: () => navigationCategory(index),
-                child: _buildRowCategory(category[index]));
-          }),
-    );
-  }
 
-  Widget _buildRowCategory(var data) {
-    return Container(
-      margin: EdgeInsets.only(left: 10, right: 10),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  new BoxShadow(
-                    color: Colors.black45.withOpacity(0.1),
-                    spreadRadius: 2.0,
-                    blurRadius: 2.0,
-                    offset: Offset(0, 2),
-                  ),
-                ]),
-            child: Center(
-              child: Icon(
-                data["icon"],
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 5,
-          ),
-          Container(
-            child: Text(
-              data["name"],
-              style: TextStyle(
-                color: Colors.black,
-                fontFamily: 'Montserrat',
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildAddCart() {
     return Container(

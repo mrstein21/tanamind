@@ -1,3 +1,4 @@
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,13 +18,6 @@ class RegisterScreen extends StatefulWidget {
 
 class RegisterViewScreen extends RegisterViewModel {
   Size size;
-  final formKey = GlobalKey<FormState>();
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-  TextEditingController _email = new TextEditingController();
-  TextEditingController _firstName = new TextEditingController();
-  TextEditingController _lastName = new TextEditingController();
-  TextEditingController _phone = new TextEditingController();
-  TextEditingController _password = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,16 +27,19 @@ class RegisterViewScreen extends RegisterViewModel {
       resizeToAvoidBottomPadding: false,
       body: BlocListener<RegisterCubit, RegisterState>(
         listener: (context, state) {
-          if(state is IsLoadingState){
+          if (state is IsLoadingState) {
             loadingDialog(context);
-          }else if(state is IsLoadedState){
+            print('loading state');
+          } else if (state is IsLoadedState) {
             print('Success state ${state.response}');
-            Navigator.pop(context,false);
-            final snackBar = SnackBar(content: Text('${state.response}'));
-            scaffoldKey.currentState.showSnackBar(snackBar);
-          }else if(state is IsErrorState){
-            Navigator.pop(context,false);
-            final snackBar = SnackBar(content: Text('Failed...'));
+
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/login', (Route<dynamic> route) => true,
+                arguments: {'register': 'register'});
+          } else if (state is IsErrorState) {
+            print('${state.message}');
+            Navigator.pop(context, false);
+            final snackBar = SnackBar(content: Text(state.message));
             scaffoldKey.currentState.showSnackBar(snackBar);
           }
         },
@@ -52,9 +49,9 @@ class RegisterViewScreen extends RegisterViewModel {
             _buildTitle(size.height * 0.15),
             _buildFormCard(
                 size.height * 0.45, size.width * 0.9, size.height * 0.25),
-            _buildButtonLogin(size.height * 0.65),
+            _buildButtonLogin(size.height * 0.67),
             _buildRegister(),
-            _buildRowFbAndGoogle(size.height * 0.13),
+            _buildRowFbAndGoogle(size.height * 0.12),
             _buildCircleTop(),
             _buildCircleBottom()
           ],
@@ -138,14 +135,18 @@ class RegisterViewScreen extends RegisterViewModel {
                       Flexible(
                         flex: 1,
                         child: TextFormField(
-                          controller: _firstName,
+                          controller: firstName,
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(20),
+                            WhitelistingTextInputFormatter(RegExp(r"[a-zA-Z]"))
+                          ],
                           decoration: InputDecoration(
                             hintText: 'Firstname',
+                            isDense: true,
                             errorStyle: TextStyle(fontSize: 0),
                             hintStyle: GoogleFonts.montserrat(
                                 fontWeight: FontWeight.w500, fontSize: 14),
-                            isDense: true,
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide:
@@ -164,14 +165,18 @@ class RegisterViewScreen extends RegisterViewModel {
                       Flexible(
                         flex: 1,
                         child: TextFormField(
-                          controller: _lastName,
+                          controller: lastName,
                           style: TextStyle(fontSize: 16),
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(20),
+                            WhitelistingTextInputFormatter(RegExp(r"[a-zA-Z]"))
+                          ],
                           decoration: InputDecoration(
                             hintText: 'Lastname',
+                            isDense: true,
                             errorStyle: TextStyle(fontSize: 0),
                             hintStyle: GoogleFonts.montserrat(
                                 fontWeight: FontWeight.w500, fontSize: 14),
-                            isDense: true,
                             enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide:
@@ -190,12 +195,12 @@ class RegisterViewScreen extends RegisterViewModel {
                     height: 16,
                   ),
                   TextFormField(
-                    controller: _email,
+                    controller: email,
                     validator: (value) => emailValidator(value),
                     style: TextStyle(fontSize: 16),
                     keyboardType: TextInputType.emailAddress,
                     inputFormatters: [
-                      LengthLimitingTextInputFormatter(10),
+                      LengthLimitingTextInputFormatter(30),
                     ],
                     decoration: InputDecoration(
                       hintText: 'Email',
@@ -216,11 +221,14 @@ class RegisterViewScreen extends RegisterViewModel {
                     height: 16,
                   ),
                   TextFormField(
-                    controller: _phone,
+                    controller: phone,
                     validator: (value) => phoneValidator(value),
                     keyboardType: TextInputType.phone,
                     style: TextStyle(fontSize: 16),
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(16),
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
                     decoration: InputDecoration(
                       hintText: 'Phone Number',
                       errorStyle: TextStyle(fontSize: 0),
@@ -240,15 +248,18 @@ class RegisterViewScreen extends RegisterViewModel {
                     height: 16,
                   ),
                   TextFormField(
-                    controller: _password,
+                    controller: password,
                     validator: (value) => passwordValidator(value),
                     style: TextStyle(fontSize: 16),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(20),
+                    ],
                     decoration: InputDecoration(
                         hintText: 'Password',
+                        isDense: true,
                         errorStyle: TextStyle(fontSize: 0, height: 0),
                         hintStyle: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500, fontSize: 14),
-                        isDense: true,
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         enabledBorder: OutlineInputBorder(
@@ -273,17 +284,7 @@ class RegisterViewScreen extends RegisterViewModel {
       right: 100,
       left: 100,
       child: InkWell(
-        onTap: () {
-          var phoneNumber = _phone.text.replaceFirst('0', '62');
-          if (!formKey.currentState.validate()) {
-            final snackBar =
-                SnackBar(content: Text('Please enter correct data...'));
-            scaffoldKey.currentState.showSnackBar(snackBar);
-          } else {
-            onButtonPressed(_firstName.text, _lastName.text, _email.text,
-                _password.text, phoneNumber);
-          }
-        },
+        onTap: onButtonPressed,
         child: Container(
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 16.0),

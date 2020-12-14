@@ -1,35 +1,77 @@
-import 'package:flutter/material.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/cubit/auth/login/login_cubit.dart';
+import 'package:tanamind/cubit/auth/login/login_state.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/shared_preferences.dart';
 import 'package:tanamind/helper/style.dart';
-import 'package:tanamind/helper/validator.dart';
+import 'package:tanamind/ui/auth/login/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginViewScreen createState() => LoginViewScreen();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginViewScreen extends LoginViewModel {
   Size size;
+  var route;
+  var routeID;
+
+  Future fushbar() async {
+    /* await Flushbar(
+      flushbarPosition: FlushbarPosition.BOTTOM,
+      message: 'Registration Success...',
+      backgroundColor: mainGreen,
+      duration: Duration(seconds: 4),
+    )
+      ..show(context);
+    await Future.delayed(new Duration(seconds: 5))
+        .then((value) => routeID = null);*/
+  }
 
   @override
   Widget build(BuildContext context) {
+    route = ModalRoute.of(context).settings.arguments as Map<String, String>;
+    if (route != null) {
+      routeID = route['register'];
+    }
     size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
       resizeToAvoidBottomPadding: false,
-      body: Stack(
-        children: [
-          _buildBackground(size.height * 0.45, size.width),
-          _buildCircleTop(),
-          _buildCircleBottom(),
-          _buildTitle(size.height * 0.15),
-          _buildFormCard(
-              size.height * 0.31, size.width * 0.9, size.height * 0.3),
-          _buildButtonLogin(size.height * 0.58),
-          _buildRowFbAndGoogle(size.height * 0.18),
-          _buildRegister(),
-        ],
+      body: BlocListener<LoginCubit, LoginState>(
+        listener: (context, state) {
+          if (state is IsLoadingState) {
+            loadingDialog(context);
+          } else if (state is IsLoginState) {
+            print("print isLogin state : ${state.message}");
+
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                '/home', (Route<dynamic> route) => false);
+          } else if (state is IsLoginErroState) {
+            print('print error state : ${state.message}');
+            Navigator.pop(context, false);
+            final snackBar = SnackBar(content: Text(state.message));
+            scaffoldKey.currentState.showSnackBar(snackBar);
+          }
+        },
+        child: Stack(
+          children: [
+            _buildBackground(size.height * 0.45, size.width),
+            _buildCircleTop(),
+            _buildCircleBottom(),
+            _buildTitle(size.height * 0.15),
+            _buildFormCard(
+                size.height * 0.31, size.width * 0.9, size.height * 0.3),
+            _buildButtonLogin(size.height * 0.58),
+            _buildRowFbAndGoogle(size.height * 0.18),
+            _buildRegister(),
+          ],
+        ),
       ),
     );
   }
@@ -37,30 +79,30 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildBackground(double height, double width) {
     return Positioned(
         child: Column(
+      children: [
+        Stack(
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: height,
-                  width: width,
-                  child: CustomPaint(
-                    painter: CurvePainter(),
-                  ),
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height / 2.5,
-                  width: MediaQuery.of(context).size.width,
-                  color: Colors.black45.withOpacity(0),
-                )
-              ],
-            ),
-            Expanded(
-              child: Container(
-                color: Colors.white,
+            Container(
+              height: height,
+              width: width,
+              child: CustomPaint(
+                painter: CurvePainter(),
               ),
             ),
+            Container(
+              height: MediaQuery.of(context).size.height / 2.5,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.black45.withOpacity(0),
+            )
           ],
-        ));
+        ),
+        Expanded(
+          child: Container(
+            color: Colors.white,
+          ),
+        ),
+      ],
+    ));
   }
 
   Widget _buildTitle(double height) {
@@ -101,17 +143,20 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Form(
+              key: formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextFormField(
-                    validator: (value) => emailValidator(value),
-                    style: TextStyle(fontSize: 20),
+                    controller: email,
+                    /*validator: (value) => nickNameValidator(value),*/
+                    style: TextStyle(fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Phone Number',
+                      isDense: true,
+                      errorStyle: TextStyle(fontSize: 0),
                       hintStyle: GoogleFonts.montserrat(
                           fontWeight: FontWeight.w500, fontSize: 14),
-                      isDense: true,
                       enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                           borderSide: BorderSide(color: mainGreen, width: 1)),
@@ -125,13 +170,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 16,
                   ),
                   TextFormField(
-                    validator: (value) => passwordValidator(value),
-                    style: TextStyle(fontSize: 20),
+                    controller: password,
+                    /*validator: (value) => passwordValidator(value),*/
+                    style: TextStyle(fontSize: 14),
+                    inputFormatters: [
+                      WhitelistingTextInputFormatter(RegExp(r"[a-zA-Z]+|[0-9]"))
+                    ],
                     decoration: InputDecoration(
                         hintText: 'Password',
+                        isDense: true,
+                        errorStyle: TextStyle(fontSize: 0),
                         hintStyle: GoogleFonts.montserrat(
                             fontWeight: FontWeight.w500, fontSize: 14),
-                        isDense: true,
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(color: mainGreen, width: 1)),
@@ -154,8 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
       right: 100,
       left: 100,
       child: InkWell(
-        onTap: () => Navigator.of(context)
-            .pushNamedAndRemoveUntil('/home', (Route<dynamic> route) => false),
+        onTap: onTapButtonLogin,
         child: Container(
           alignment: Alignment.center,
           padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -253,7 +302,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         'Do you have an account?',
-                        style: fontRoboto(15.0, FontWeight.w600, Colors.black54),
+                        style:
+                            fontRoboto(15.0, FontWeight.w600, Colors.black54),
                       ),
                       SizedBox(
                         width: 8,

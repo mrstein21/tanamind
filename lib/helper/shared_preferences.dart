@@ -6,6 +6,7 @@ class UserPreferences {
   static String sharedUserName = 'USERNAME';
   static String sharedUserEmail = 'EMAIL';
   static String sharedUserPhone = 'PHONE';
+  static String sharedUserID = 'USERID';
 
   //STORE DATA TO SHARED PREFERENCES
 
@@ -15,10 +16,16 @@ class UserPreferences {
     return await preferences.setString(sharedUserToken, token);
   }
 
-  static Future<void> setUserName(String firstName, String lastName) async {
+  static Future<void> setUserId(int id) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    return await preferences.setString(sharedUserEmail, firstName + lastName);
+    return await preferences.setInt(sharedUserID, id);
+  }
+
+  static Future<void> setUserName(String firstName) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    return await preferences.setString(sharedUserName, firstName);
   }
 
   static Future<void> setUserEmail(String email) async {
@@ -41,6 +48,12 @@ class UserPreferences {
     return await preferences.getString(sharedUserToken);
   }
 
+  static Future<int> getUserID() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    return await preferences.getInt(sharedUserID);
+  }
+
   static Future<String> getUserEmail() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
@@ -50,12 +63,18 @@ class UserPreferences {
   static Future<String> getUserName() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    return await preferences.getString(sharedUserName);
+    return preferences.getString(sharedUserName);
   }
 
   static Future<String> getUserPhone() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
     return await preferences.getString(sharedUserPhone);
+  }
+
+  static Future<void> clearUserPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    return await preferences.clear();
   }
 }
