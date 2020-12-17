@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           }),
         ),
         routes: routes,
-        home: LoginScreen(),
+        home: HomeScreen(),
       ),
     );
   }

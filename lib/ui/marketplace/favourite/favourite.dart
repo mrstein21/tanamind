@@ -1,8 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:tanamind/cubit/favourite/add_delete_cubit.dart';
+import 'package:tanamind/cubit/favourite/add_delete_item_favourite_state.dart';
+import 'package:tanamind/cubit/favourite/favourite_cubit.dart';
+import 'package:tanamind/cubit/favourite/favourite_state.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
+import 'package:tanamind/model/favourite_model/favourite_model.dart';
 import 'favourite_view_model.dart';
 
 class FavouriteScreen extends StatefulWidget {
@@ -12,38 +20,114 @@ class FavouriteScreen extends StatefulWidget {
 
 class FavouriteView extends FavouriteViewModel {
   var size;
+  FavouriteCubit cubit;
+  final delete = FavoriteActionCubit();
+  final scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    cubit = BlocProvider.of<FavouriteCubit>(context);
+    cubit.getData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
+
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         backgroundColor: mainGreen,
-        title: Text("My Favourite"),
+        title: Row(
+          children: [
+            IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: () => Navigator.pushNamed(context, '/home')),
+            Text("My Favourite"),
+          ],
+        ),
+        automaticallyImplyLeading: false,
       ),
-      body: list_favourite.isEmpty
-          ? Center(
-              child: Text(
-                'No Favourite Item...',
-                style: fontRoboto(19.0, FontWeight.bold, mainGreen),
-              ),
-            )
-          : Container(
-              color: Colors.white,
-              child: _buildListFavourite(),
-            ),
+      body: BlocListener<FavouriteCubit, FavouriteState>(
+          listener: (_, state) {
+            if (state is FavDeleted) {
+              final snackBar = SnackBar(
+                  duration: const Duration(seconds: 2),
+                  content: Text('${state.message}'));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+              return _buildListFavourite();
+            } else if (state is FavouriteIsError) {
+              final snackBar = SnackBar(
+                  duration: const Duration(seconds: 2),
+                  content: Text('${state.message}'));
+              scaffoldKey.currentState.showSnackBar(snackBar);
+            }
+          },
+          child: _buildListFavourite()),
     );
   }
 
   Widget _buildListFavourite() {
+    return BlocBuilder<FavouriteCubit, FavouriteState>(
+      // ignore: missing_return
+      builder: (context, state) {
+        if (state is FavouriteIsLoading) {
+          return _buildLoading();
+        } else if (state is FavouriteIsLoaded) {
+          return ListView.builder(
+            itemCount: state.list.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return _buildRowCart(state.list[index], index);
+            },
+          );
+        } else if (state is FavouriteIsError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(icon: Icon(Icons.refresh, color: mainGreen, size: 30,), onPressed: ()=> cubit.getData()),
+                Text('Internal Server Error...'),
+              ],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildLoading() {
     return ListView.builder(
-        itemCount: list_favourite.length,
+        itemCount: 4,
+        shrinkWrap: true,
         itemBuilder: (context, index) {
-          return _buildRowCart(list_favourite, index);
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              height: 130,
+              child: Shimmer.fromColors(
+                baseColor: Colors.grey[300],
+                highlightColor: Colors.grey[100],
+                child: Container(
+                  height: 130,
+                  width: double.infinity,
+                  color: Colors.white,
+                  margin: EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+            ),
+          );
         });
   }
 
-  Widget _buildRowCart(var data, int index) {
+  Widget _buildRowCart(FavouriteModel data, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -63,7 +147,7 @@ class FavouriteView extends FavouriteViewModel {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              _buildImage(data[index]["image"]),
+              _buildImage(list_favourite[index]["image"]),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0),
@@ -75,24 +159,25 @@ class FavouriteView extends FavouriteViewModel {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            data[index]["name"],
-                            style: fontMonsserat(16.0, FontWeight.w600, Colors.black),
+                            data.detailModel.name,
+                            style: fontMonsserat(
+                                16.0, FontWeight.w600, Colors.black),
                           ),
                           SizedBox(
                             height: 4,
                           ),
                           Text(
-                            data[index]["description"],
+                            data.detailModel.description,
                             style: GoogleFonts.montserrat(
                                 fontSize: 14.0,
                                 color: Colors.grey,
-                            fontStyle: FontStyle.italic),
+                                fontStyle: FontStyle.italic),
                           ),
                           SizedBox(
                             height: 3,
                           ),
                           Text(
-                            data[index]["price"],
+                            data.detailModel.price,
                             style: fontRoboto(14.0, FontWeight.bold, mainGreen),
                           ),
                         ],
@@ -101,11 +186,9 @@ class FavouriteView extends FavouriteViewModel {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
-                              setState(() {
-                                data.removeAt(index);
-                              });
+                              cubit.delete('${data.id}');
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(right: 8.0),
@@ -155,6 +238,15 @@ class FavouriteView extends FavouriteViewModel {
   Widget _buildBottom() {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+          color: mainGreen,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.black38,
+              blurRadius: 2.0,
+            ),
+          ]),
       child: Center(
         child: IntrinsicHeight(
           child: Row(
@@ -177,15 +269,6 @@ class FavouriteView extends FavouriteViewModel {
           ),
         ),
       ),
-      decoration: BoxDecoration(
-          color: mainGreen,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black38,
-              blurRadius: 2.0,
-            ),
-          ]),
     );
   }
 }

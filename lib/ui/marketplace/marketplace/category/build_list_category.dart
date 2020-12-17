@@ -31,7 +31,8 @@ class CategoryViewScreen extends CategoryViewModel {
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   return InkWell(
-                    onTap: () => navigationCategory(state.list[index].name),
+                    onTap: () => navigationCategory(
+                        state.list[index].name, state.list[index].id),
                     child: _buildRowCategory(state.list[index], index),
                   );
                 }),

@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/repository/favourite_repository/favourite_repository.dart';
 import 'package:tanamind/ui/home/home_view_model.dart';
 
 import 'bottom_navbar_helper.dart';
@@ -31,9 +33,18 @@ class HomeScreenView extends HomeViewModel {
     });
   }
 
+  void getFav() async {
+    await FavouriteRepository().getData().then((value){
+      cartGlobal =  value.length;
+    }).catchError((e){
+      cartGlobal = 0;
+    });
+  }
+
   @override
   void initState() {
     getUserPreferencess();
+    getFav();
     super.initState();
   }
 

@@ -5,4 +5,6 @@ var listGlobal = [
   {'title':'Toge', 'panen':0.3,'image':'assets/tanaman/tanaman_2.jpg'},
   {'title':'Lidah Buaya', 'panen':0.2,'image':'assets/tanaman/tanaman_4.jpg'},
 ];
+
+var cartGlobal;
   

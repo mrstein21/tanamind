@@ -1,10 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:tanamind/cubit/favourite/add_delete_cubit.dart';
+import 'package:tanamind/cubit/favourite/add_delete_item_favourite_state.dart';
+import 'package:tanamind/cubit/marketplace/category/category_item/category_item_cubit.dart';
+import 'package:tanamind/cubit/marketplace/category/category_item/category_item_state.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/ui/marketplace/category/alat/alat_view_model.dart';
+import 'package:tanamind/ui/marketplace/category/alat/list_item.dart';
 
 class AlatScreen extends StatefulWidget {
   @override
@@ -18,6 +25,11 @@ class AlatViewScreen extends AlatViewModel {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
+
+    var route =
+        ModalRoute.of(context).settings.arguments as Map<String, String>;
+    var idCategory = route['id'];
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -26,7 +38,7 @@ class AlatViewScreen extends AlatViewModel {
         title: _buildHeader(),
       ),
       body: SafeArea(
-        child: ListView(
+        child: Column(
           children: [
             /*_buildHeader(),*/
             _buildFilter(),
@@ -34,7 +46,14 @@ class AlatViewScreen extends AlatViewModel {
             SizedBox(
               height: 10,
             ),
-            _buildListItem()
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListItem(
+                  id: idCategory,
+                ),
+              ),
+            )
           ],
         ),
       ),
@@ -42,6 +61,12 @@ class AlatViewScreen extends AlatViewModel {
   }
 
   Widget _buildHeader() {
+    bool showN = false;
+    if(cartGlobal != 0 || cartGlobal != null){
+      showN = true;
+    }
+
+    /// do an update icon here
     return Row(
       children: [
         Padding(
@@ -78,6 +103,29 @@ class AlatViewScreen extends AlatViewModel {
             ),
           ),
         ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: InkWell(
+            onTap:() => Navigator.pushNamed(context, 'favourite') ,
+            child: Badge(
+              badgeColor: Colors.white,
+              animationType: BadgeAnimationType.slide,
+              showBadge: showN,
+              badgeContent: Text(
+                cartGlobal != 0 ? '1' : '1',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: mainGreen),
+              ),
+              toAnimate: true,
+              child: Icon(
+                Icons.favorite,
+                color: mainGreen,
+                size: 30,
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -178,19 +226,6 @@ class AlatViewScreen extends AlatViewModel {
           style: fontMonsserat(12.0, FontWeight.w400, Colors.black),
         ),
       ),
-    );
-  }
-
-  Widget _buildListItem() {
-    return new StaggeredGridView.countBuilder(
-      itemCount: listAlat.length,
-      primary: false,
-      shrinkWrap: true,
-      crossAxisCount: 4,
-      crossAxisSpacing: 0,
-      mainAxisSpacing: 0,
-      itemBuilder: (context, index) => _buildCardItem(listAlat[index]),
-      staggeredTileBuilder: (index) => new StaggeredTile.fit(2),
     );
   }
 
@@ -297,11 +332,11 @@ class AlatViewScreen extends AlatViewModel {
             return new Container(
               padding: EdgeInsets.all(12.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
-                topRight: Radius.circular(8),
-                topLeft: Radius.circular(8),
-              )),
+                    topRight: Radius.circular(8),
+                    topLeft: Radius.circular(8),
+                  )),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -410,153 +445,153 @@ class AlatViewScreen extends AlatViewModel {
         builder: (BuildContext context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter state) {
-                return new Container(
-                  padding: EdgeInsets.all(12.0),
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(8),
-                        topLeft: Radius.circular(8),
-                      )),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
+            return new Container(
+              padding: EdgeInsets.all(12.0),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(8),
+                    topLeft: Radius.circular(8),
+                  )),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              new Text(
-                                'Newest',
-                              ),
-                              new Radio(
-                                value: 0,
-                                groupValue: radioValue,
-                                onChanged: (value) {
-                                  state(() {
-                                    radioValue = value;
-                                    filter = 'Diskon';
-                                  });
-                                },
-                              ),
-                            ],
+                          new Text(
+                            'Newest',
                           ),
-                          Divider(
-                            color: Colors.black26,
+                          new Radio(
+                            value: 0,
+                            groupValue: radioValue,
+                            onChanged: (value) {
+                              state(() {
+                                radioValue = value;
+                                filter = 'Diskon';
+                              });
+                            },
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text(
-                                'Promo',
-                              ),
-                              new Radio(
-                                value: 1,
-                                groupValue: radioValue,
-                                onChanged: (value) {
-                                  state(() {
-                                    radioValue = value;
-                                    filter = 'Promo';
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            color: Colors.black26,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text(
-                                'Sale',
-                              ),
-                              new Radio(
-                                value: 2,
-                                groupValue: radioValue,
-                                onChanged: (value) {
-                                  state(() {
-                                    radioValue = value;
-                                    filter = 'Sale';
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            color: Colors.black26,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text(
-                                'Min Price',
-                              ),
-                              new Radio(
-                                value: 3,
-                                groupValue: radioValue,
-                                onChanged: (value) {
-                                  state(() {
-                                    radioValue = value;
-                                    filter = 'Sale';
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            color: Colors.black26,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              new Text(
-                                'Max Price',
-                              ),
-                              new Radio(
-                                value: 4,
-                                groupValue: radioValue,
-                                onChanged: (value) {
-                                  state(() {
-                                    radioValue = value;
-                                    filter = 'Sale';
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          Divider(
-                            color: Colors.black26,
-                          )
                         ],
                       ),
-                      InkWell(
-                        onTap: () {
-                          setState(() {});
-                          Navigator.pop(context, false);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12.0),
-                          child: Container(
-                            width: 100,
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(vertical: 12.0),
-                            decoration: BoxDecoration(
-                                color: mainGreen,
-                                borderRadius: BorderRadius.circular(6)),
-                            child: Text(
-                              'OK',
-                              style:
-                              fontRoboto(14.0, FontWeight.w500, Colors.white),
-                            ),
+                      Divider(
+                        color: Colors.black26,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            'Promo',
                           ),
-                        ),
+                          new Radio(
+                            value: 1,
+                            groupValue: radioValue,
+                            onChanged: (value) {
+                              state(() {
+                                radioValue = value;
+                                filter = 'Promo';
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        color: Colors.black26,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            'Sale',
+                          ),
+                          new Radio(
+                            value: 2,
+                            groupValue: radioValue,
+                            onChanged: (value) {
+                              state(() {
+                                radioValue = value;
+                                filter = 'Sale';
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        color: Colors.black26,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            'Min Price',
+                          ),
+                          new Radio(
+                            value: 3,
+                            groupValue: radioValue,
+                            onChanged: (value) {
+                              state(() {
+                                radioValue = value;
+                                filter = 'Sale';
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        color: Colors.black26,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            'Max Price',
+                          ),
+                          new Radio(
+                            value: 4,
+                            groupValue: radioValue,
+                            onChanged: (value) {
+                              state(() {
+                                radioValue = value;
+                                filter = 'Sale';
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(
+                        color: Colors.black26,
                       )
                     ],
                   ),
-                );
-              });
+                  InkWell(
+                    onTap: () {
+                      setState(() {});
+                      Navigator.pop(context, false);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Container(
+                        width: 100,
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        decoration: BoxDecoration(
+                            color: mainGreen,
+                            borderRadius: BorderRadius.circular(6)),
+                        child: Text(
+                          'OK',
+                          style:
+                              fontRoboto(14.0, FontWeight.w500, Colors.white),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
         });
   }
 }

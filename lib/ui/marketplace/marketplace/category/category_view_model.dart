@@ -14,9 +14,10 @@ abstract class CategoryViewModel extends State<ListCategory> {
     {"name": "Lain-lain", "icon": Icons.dashboard}
   ];
 
-  void navigationCategory(String name) {
-    if (name == 'Alat') {
-      Navigator.pushNamed(context, '/alat_screen');
+  void navigationCategory(String name, var id) {
+    Navigator.pushNamed(context, '/alat_screen', arguments: {'id': '$id'});
+    /*if (name == 'Alat') {
+      Navigator.pushNamed(context, '/alat_screen', arguments: {'id': '$id'});
     } else if (name == 'Pot') {
       Navigator.pushNamed(context, '/pot_screen');
     } else if (name == 'Bibit') {
@@ -29,6 +30,6 @@ abstract class CategoryViewModel extends State<ListCategory> {
       Navigator.pushNamed(context, '/pupuk_screen');
     } else if (name == 'Lain-lain') {
       Navigator.pushNamed(context, '/etc_screen');
-    }
+    }*/
   }
 }
