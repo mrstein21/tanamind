@@ -1,23 +1,29 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-abstract class FavouriteState extends Equatable {}
+abstract class FavoriteState extends Equatable {}
 
-class FavouriteIsLoading extends FavouriteState {
+class FavoriteIsLoading extends FavoriteState {
   @override
   List<Object> get props => [];
 }
 
-class FavouriteIsLoaded extends FavouriteState {
+class FavoriteIsLoaded extends FavoriteState {
   final list;
 
-  FavouriteIsLoaded({@required this.list});
+  FavoriteIsLoaded({@required this.list});
 
   @override
   List<Object> get props => [list];
 }
 
-class FavDeleted extends FavouriteState {
+class IsEmpty extends FavoriteState{
+  @override
+  List<Object> get props => [];
+
+}
+
+class FavDeleted extends FavoriteState {
   final message;
 
   FavDeleted(this.message);
@@ -26,10 +32,10 @@ class FavDeleted extends FavouriteState {
   List<Object> get props => [message];
 }
 
-class FavouriteIsError extends FavouriteState {
+class FavoriteIsError extends FavoriteState {
   final message;
 
-  FavouriteIsError({@required this.message});
+  FavoriteIsError({@required this.message});
 
   @override
   List<Object> get props => [message];

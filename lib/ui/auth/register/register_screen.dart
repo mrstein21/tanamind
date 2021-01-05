@@ -10,6 +10,7 @@ import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/helper/validator.dart';
 import 'package:tanamind/ui/auth/register/register_view_model.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -34,13 +35,12 @@ class RegisterViewScreen extends RegisterViewModel {
             print('Success state ${state.response}');
 
             Navigator.of(context).pushNamedAndRemoveUntil(
-                '/login', (Route<dynamic> route) => true,
+                '/home', (Route<dynamic> route) => true,
                 arguments: {'register': 'register'});
           } else if (state is IsErrorState) {
             print('${state.message}');
             Navigator.pop(context, false);
-            final snackBar = SnackBar(content: Text(state.message));
-            scaffoldKey.currentState.showSnackBar(snackBar);
+            flushBar(context, state.message);
           }
         },
         child: Stack(
@@ -249,27 +249,35 @@ class RegisterViewScreen extends RegisterViewModel {
                   ),
                   TextFormField(
                     controller: password,
+                    obscureText: visible,
                     validator: (value) => passwordValidator(value),
                     style: TextStyle(fontSize: 16),
                     inputFormatters: [
                       LengthLimitingTextInputFormatter(20),
                     ],
                     decoration: InputDecoration(
-                        hintText: 'Password',
-                        isDense: true,
-                        errorStyle: TextStyle(fontSize: 0, height: 0),
-                        hintStyle: GoogleFonts.montserrat(
-                            fontWeight: FontWeight.w500, fontSize: 14),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: mainGreen, width: 1)),
-                        border: OutlineInputBorder(
+                      hintText: 'Password',
+                      isDense: true,
+                      errorStyle: TextStyle(fontSize: 0, height: 0),
+                      hintStyle: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w500, fontSize: 14),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: mainGreen, width: 2),
+                          borderSide: BorderSide(color: mainGreen, width: 1)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: mainGreen, width: 2),
+                      ),
+                      suffixIcon: InkWell(
+                        onTap: onVisible,
+                        child: Icon(
+                          Icons.remove_red_eye,
+                          color: visible ? Colors.grey : mainGreen,
                         ),
-                        suffixIcon: Icon(Icons.remove_red_eye)),
+                      ),
+                    ),
                   ),
                 ],
               ),

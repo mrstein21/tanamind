@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tanamind/cubit/auth/login/login_state.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/shared_preferences.dart';
 import 'package:tanamind/model/auth_model/user_model.dart';
 import 'package:tanamind/repository/auth/login.dart';
@@ -28,6 +29,11 @@ class LoginCubit extends Cubit<LoginState> {
         UserPreferences.setUserName(username);
         UserPreferences.setUserEmail(user['email']);
         UserPreferences.setUserPhone(user['phone']);
+        UserPreferences.setUserCart(user['cart_length']);
+        UserPreferences.setUserFav(user['fav_length']);
+        cartLength = user['cart_length'];
+        favLength = user['fav_length'];
+        tokenGlobal = token['access_token'];
         emit(IsLoginState(json['status']));
       } else if (json['status'] == 400) {
         var message;

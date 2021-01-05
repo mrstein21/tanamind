@@ -1,11 +1,17 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icon_badge/icon_badge.dart';
+import 'package:tanamind/cubit/marketplace/cart/add_cart_cubit.dart';
+import 'package:tanamind/cubit/marketplace/cart/add_cart_state.dart';
 import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
-import 'package:tanamind/repository/favourite_repository/favourite_repository.dart';
+import 'package:tanamind/repository/favorite/favourite_repository.dart';
 import 'package:tanamind/ui/home/home_view_model.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
 
 import 'bottom_navbar_helper.dart';
 
@@ -33,18 +39,9 @@ class HomeScreenView extends HomeViewModel {
     });
   }
 
-  void getFav() async {
-    await FavouriteRepository().getData().then((value){
-      cartGlobal =  value.length;
-    }).catchError((e){
-      cartGlobal = 0;
-    });
-  }
-
   @override
   void initState() {
     getUserPreferencess();
-    getFav();
     super.initState();
   }
 
@@ -65,17 +62,24 @@ class HomeScreenView extends HomeViewModel {
       print('font size $fSize and screen size is $screenHeight');
     }
 
+    if(tokenGlobal != null){
+      cart = BlocProvider.of<AddCartCubit>(context);
+    }
+
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: mainGreen,
-      body: Stack(
-        children: [_buildMenu(), _buildDashboard()],
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Stack(
+          children: [_buildMenu(), _buildDashboard()],
+        ),
       ),
     );
   }
 
   Widget _buildMenu() {
-    print('user name : $userName');
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Align(
@@ -223,7 +227,7 @@ class HomeScreenView extends HomeViewModel {
                     ),
                   ),
                 ),
-                Padding(
+                /*Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -243,33 +247,35 @@ class HomeScreenView extends HomeViewModel {
                       ),
                     ],
                   ),
-                ),
+                ),*/
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.power_settings_new,
-                  color: Colors.white,
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                InkWell(
-                  onTap: logOut,
-                  child: Container(
-                    width: 100,
-                    padding: EdgeInsets.symmetric(vertical: 4.0),
-                    child: Text(
-                      "Logout",
-                      style: TextStyle(
-                          color: Colors.white, fontFamily: 'Montserrat'),
+            Container(
+              width: screenWidth * 0.25,
+              child: InkWell(
+                onTap: logOut,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.power_settings_new,
+                      color: Colors.white,
                     ),
-                  ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 4.0),
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(
+                            color: Colors.white, fontFamily: 'Montserrat'),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -320,19 +326,32 @@ class HomeScreenView extends HomeViewModel {
               mini: true,
               backgroundColor: mainGreen,
               onPressed: () {
-                if (children[index]["name"] == 'Tanamanku')
-                  Navigator.pushNamed(context, "/add_pot");
-                else
-                  setState(() {
-                    this.index = 2;
-                  });
+                if(tokenGlobal != null){
+                  if (children[index]["name"] == 'Tanamanku')
+                    Navigator.pushNamed(context, "/add_pot");
+                  else
+                    Navigator.pushNamed(context, '/cart');
+                }else{
+                  flushBar(context, 'Anda harus login terlebih dahulu');
+                }
               },
-              child: Icon(
-                children[index]["name"] == 'Tanamanku'
-                    ? Icons.add
-                    : Icons.shopping_basket,
-                color: Colors.white,
-              ),
+              child: children[index]['name'] == 'Tanamanku' ? Icon(Icons.add) : BlocListener<AddCartCubit, AddCartState>(
+                listener: (context, state){
+                  if(state is AddedItemCart){
+                    setState(() {
+                      getCart();
+                    });
+                  }
+                },
+                child: Badge(
+                  badgeContent: Text(cartLength != null ? '$cartLength' : ''),
+                  position: BadgePosition.topEnd(end: -16,top: -16),
+                  animationType: BadgeAnimationType.scale,
+                  badgeColor: Colors.white,
+                  showBadge: cartLength != null ? cartLength != 0 ? true : false : false,
+                  child: Icon(Icons.shopping_basket),
+                ),
+              )
             ),
             bottomNavigationBar: FABBottomAppBar(
               color: Colors.grey,
@@ -351,9 +370,7 @@ class HomeScreenView extends HomeViewModel {
                     text: 'Market',
                     fSize: fSize),
                 FABBottomAppBarItem(
-                    iconData: Icons.account_circle,
-                    text: 'Akun',
-                    fSize: fSize),
+                    iconData: Icons.account_circle, text: 'Akun', fSize: fSize),
               ],
             ),
           ),

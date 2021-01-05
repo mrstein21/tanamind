@@ -7,4 +7,9 @@ var listGlobal = [
 ];
 
 var cartGlobal;
+
+var tokenGlobal;
+
+var cartLength;
+var favLength;
   

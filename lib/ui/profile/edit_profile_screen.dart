@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/style.dart';
 
 class EditProfileScreen extends StatefulWidget {
   @override
@@ -9,24 +10,42 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  TextEditingController _name = TextEditingController();
+
   Size size;
   var gender;
+  var name;
+  var email;
+  var phone;
+  var id;
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
+    final route =
+        ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+    if (route != null) {
+      id = route['id'];
+      name = route['name'];
+      email = route['email'];
+      phone = route['phone'];
+    }
+
+    print(phone);
+
     return Scaffold(
       body: ListView(
         children: [
           _buildAppBar(),
           _buildAvatar(),
           SizedBox(
-            height: size.height * 0.1,
+            height: size.height * 0.03,
           ),
           _buildName(),
           _buildGender(),
           _buildEmail(),
-          _buildPhone()
+          _buildPhone(),
+          _buildButtonSave()
         ],
       ),
     );
@@ -109,12 +128,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 4.0),
-            child: Text(
-              'Aruria',
+            /* child: Text(
+              name ?? '',
               style: GoogleFonts.roboto(
                   fontSize: 14.0,
                   color: Colors.black54,
                   fontWeight: FontWeight.w500),
+            ),*/
+            child: TextField(
+              controller: _name,
+              decoration: InputDecoration(
+                hintText: name ?? '',
+                isDense: true,
+                errorStyle: TextStyle(fontSize: 0),
+                hintStyle: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w500, fontSize: 14),
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+              ),
             ),
           ),
           SizedBox(
@@ -189,19 +222,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Row(
+            child:
+                /* Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Aruria@CodeHouse.id',
+
+               */ /* Text(
+                  email ?? '',
                   style: GoogleFonts.roboto(color: Colors.black54),
-                ),
-                /*Icon(
+                ),*/ /*
+                */ /*Icon(
                   Icons.edit,
                   color: Colors.grey,
                   size: 15,
-                )*/
+                )*/ /*
               ],
+            ),*/
+                TextField(
+              decoration: InputDecoration(
+                hintText: email ?? '',
+                isDense: true,
+                errorStyle: TextStyle(fontSize: 0),
+                hintStyle: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w500, fontSize: 14),
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+              ),
             ),
           ),
           Divider(
@@ -224,19 +272,34 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Row(
+            child:
+                /*Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '0856-2461-xxx',
+
+                */ /*Text(
+                  phone ?? '',
                   style: GoogleFonts.roboto(color: Colors.black54),
-                ),
-                /*Icon(
+                ),*/ /*
+                */ /*Icon(
                   Icons.edit,
                   color: Colors.grey,
                   size: 15,
-                )*/
+                )*/ /*
               ],
+            ),*/
+                TextField(
+              decoration: InputDecoration(
+                hintText: phone ?? 'null',
+                isDense: true,
+                errorStyle: TextStyle(fontSize: 0),
+                hintStyle: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.w500, fontSize: 14),
+                focusedBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+              ),
             ),
           ),
           Divider(
@@ -247,89 +310,105 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildButtonSave() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+      child: Container(
+        alignment: Alignment.center,
+        padding: EdgeInsets.symmetric(vertical: 16.0),
+        decoration: BoxDecoration(
+            color: mainGreen, borderRadius: BorderRadius.circular(8)),
+        child: Text(
+          'Save',
+          style: fontRoboto(14.0, FontWeight.w500, Colors.white),
+        ),
+      ),
+    );
+  }
+
   _showMaterialDialog() {
     showDialog(
-        context: context,
-        builder: (_) => new AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)),
-          title: new Text("Select Gender"),
-          content: new Container(
-            height: size.height * 0.3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
+      context: context,
+      builder: (_) => new AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: new Text("Select Gender"),
+        content: new Container(
+          height: size.height * 0.3,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            gender = 'Male';
+                          });
+                          Navigator.pop(context, false);
+                        },
+                        child: Column(
+                          children: [
+                            Image.asset('assets/icon/ic_male.png'),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text('Male'),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            gender = 'Female';
+                          });
+                          Navigator.pop(context, false);
+                        },
+                        child: Column(
+                          children: [
+                            Image.asset('assets/icon/ic_female.png'),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text('Female'),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        gender = 'I dont want specify';
+                      });
+                      Navigator.pop(context, false);
+                    },
+                    child: Column(
                       children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              gender = 'Male';
-                            });
-                            Navigator.pop(context, false);
-                          },
-                          child: Column(
-                            children: [
-                              Image.asset('assets/icon/ic_male.png'),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text('Male'),
-                              )
-                            ],
-                          ),
+                        Image.asset('assets/icon/ic_unknown_gender.png'),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text('I dont want specify'),
                         )
                       ],
                     ),
-                    Column(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              gender = 'Female';
-                            });
-                            Navigator.pop(context, false);
-                          },
-                          child: Column(
-                            children: [
-                              Image.asset('assets/icon/ic_female.png'),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text('Female'),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          gender = 'I dont want specify';
-                        });
-                        Navigator.pop(context, false);
-                      },
-                      child: Column(
-                        children: [
-                          Image.asset('assets/icon/ic_unknown_gender.png'),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text('I dont want specify'),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                  )
+                ],
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

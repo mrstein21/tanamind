@@ -10,6 +10,7 @@ abstract class RegisterViewModel extends State<RegisterScreen> {
   SharedPreferences sharedPreferences;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool visible = true;
   TextEditingController email = new TextEditingController();
   TextEditingController firstName = new TextEditingController();
   TextEditingController lastName = new TextEditingController();
@@ -37,6 +38,16 @@ abstract class RegisterViewModel extends State<RegisterScreen> {
     }
   }
 
+  onVisible() {
+    setState(() {
+      if(visible == false){
+        visible = true;
+      }else{
+        visible = false;
+      }
+    });
+  }
+
   //loading widget
   void loadingDialog(BuildContext context) {
     showDialog(
@@ -49,6 +60,6 @@ abstract class RegisterViewModel extends State<RegisterScreen> {
               radius: 15,
             ),
           );
-        });
+        },);
   }
 }

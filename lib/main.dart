@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tanamind/cubit/auth/login/login_cubit.dart';
-import 'package:tanamind/cubit/auth/register/register_cubit.dart';
+import 'package:tanamind/TesSearch.dart';
+import 'package:tanamind/model/hive_model/hive_cart_model.dart';
 import 'package:tanamind/provider/bloc_provider.dart';
-import 'package:tanamind/repository/auth/login.dart';
-import 'package:tanamind/repository/auth/register.dart';
 import 'package:tanamind/routes.dart';
-import 'package:tanamind/ui/auth/login/login_screen.dart';
+import 'package:tanamind/ui/TesCubit.dart';
 import 'package:tanamind/ui/home/home_screen.dart';
+import 'package:path_provider/path_provider.dart' as pathProvider;
+import 'package:hive/hive.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  var hiveStorage = await pathProvider.getApplicationDocumentsDirectory();
+  Hive.init(hiveStorage.path);
+  Hive.registerAdapter(HiveCartModelAdapter());
   runApp(MyApp());
 }
 

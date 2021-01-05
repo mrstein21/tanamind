@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/ui/kelola/add_pot/add_pot_view_model.dart';
 import 'package:tanamind/ui/kelola/add_pot/preview_image_screen.dart';
 
@@ -20,9 +21,6 @@ class PotScreenView extends AddPotViewModel {
   File _image;
   final picker = ImagePicker();
 
-  TextEditingController _title = new TextEditingController();
-  TextEditingController _label = new TextEditingController();
-  TextEditingController _desc = new TextEditingController();
 
   Future getImage() async {
     final pickerImage = await picker.getImage(source: ImageSource.camera);
@@ -31,21 +29,12 @@ class PotScreenView extends AddPotViewModel {
         setState(() {
           _image = File(pickerImage.path);
           listImage.add(_image);
+          xxx = _image;
         });
       } else {
         print('no image selected');
       }
     });
-  }
-
-  submitBtn() {
-    Map<String, dynamic> data = {
-      'title': _title.text,
-      'panen': 0.1,
-      'image': randomImage[Random().nextInt(4)]
-    };
-
-    listGlobal.add(data);
   }
 
   @override
@@ -60,7 +49,7 @@ class PotScreenView extends AddPotViewModel {
                 Icons.check,
                 color: Colors.white,
               ),
-              onPressed: submitBtn)
+              onPressed: onSubmitBtn)
         ],
       ),
       body: SingleChildScrollView(
@@ -69,7 +58,6 @@ class PotScreenView extends AddPotViewModel {
             children: [
               _buildImage(),
               _buildTitle(),
-              _buildLabel(),
               _description()
             ],
           ),
@@ -94,20 +82,45 @@ class PotScreenView extends AddPotViewModel {
           bottom: BorderSide(color: Color(0xffcccccc)),
           right: BorderSide(color: Color(0xffcccccc)),
         )),
-        child: listImage.length == 0
-            ? _buildEmptyImage()
-            : GridView.builder(
+        child: xxx == null
+            ? _buildEmptyImage() : _buildphoto()
+            /*: GridView.builder(
                 itemCount: listImage.length,
                 shrinkWrap: true,
                 padding: EdgeInsets.only(top: 8),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
+                    crossAxisCount: 1,
                     mainAxisSpacing: 1,
-                    childAspectRatio: 0.75,
+                    childAspectRatio: 0.90,
                     crossAxisSpacing: 1),
                 itemBuilder: (context, index) {
                   return _buildImageList(listImage, index);
-                }),
+                }),*/
+      ),
+    );
+  }
+
+  Widget _buildphoto(){
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5,
+              blurRadius: 7,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ]),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.file(
+          xxx,
+          fit: BoxFit.cover,
+          height: 250,
+        ),
       ),
     );
   }
@@ -122,9 +135,16 @@ class PotScreenView extends AddPotViewModel {
         color: Colors.white,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        'No Image Selected',
-        style: GoogleFonts.roboto(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.camera_alt, color: Colors.black54, size: 30,),
+          SizedBox(height: 8.0,),
+          Text(
+            'No Image Selected',
+            style: fontRoboto(12.0, FontWeight.w500, Colors.black54),
+          ),
+        ],
       ),
     );
   }
@@ -134,6 +154,8 @@ class PotScreenView extends AddPotViewModel {
       onTap: () => Navigator.pushNamed(context, '/preview_image',
           arguments: {'image': list[index]}),
       child: Container(
+        height: 200,
+        width: 300,
         margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         decoration: BoxDecoration(
             color: Colors.white,
@@ -164,7 +186,7 @@ class PotScreenView extends AddPotViewModel {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TextFormField(
-        controller: _title,
+        controller: title,
         style: TextStyle(fontSize: 20),
         decoration: InputDecoration(
           hintText: 'Title',
@@ -188,7 +210,7 @@ class PotScreenView extends AddPotViewModel {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: TextFormField(
-        controller: _label,
+        controller: label,
         style: TextStyle(fontSize: 20),
         decoration: InputDecoration(
           hintText: 'Label',
@@ -226,7 +248,7 @@ class PotScreenView extends AddPotViewModel {
           child: Padding(
             padding: EdgeInsets.all(8.0),
             child: TextFormField(
-              controller: _desc,
+              controller: desc,
               maxLines: 8,
               decoration: InputDecoration.collapsed(
                 hintText: "Enter your description here",

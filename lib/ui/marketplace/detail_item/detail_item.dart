@@ -1,7 +1,18 @@
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:tanamind/cubit/favourite/add_fav_cubit.dart';
+import 'package:tanamind/cubit/favourite/add_fav_state.dart';
+import 'package:tanamind/cubit/marketplace/similar_item/similar_item_cubit.dart';
+import 'package:tanamind/cubit/marketplace/similar_item/similar_item_state.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/style.dart';
+import 'package:tanamind/model/marketplace_model/category_item_model.dart';
+import 'package:tanamind/ui/marketplace/similar_item/similar_screen.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
 
 import 'detail_item_view_model.dart';
 
@@ -12,15 +23,28 @@ class DetailItem extends StatefulWidget {
 
 class DetailItemView extends DetailItemViewModel {
   var size;
+  var data;
+  String image;
+
+  @override
+  void initState() {
+    fav = BlocProvider.of<AddFavCubit>(context);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final route =
+        ModalRoute.of(context).settings.arguments as Map<String, dynamic>;
+    data = route['data'];
+    image = route['image'];
+
     size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
         children: [
           Image.asset(
-            item["image"],
+            image ?? item["image"],
             fit: BoxFit.cover,
             width: double.infinity,
             height: size.height / 2,
@@ -31,175 +55,31 @@ class DetailItemView extends DetailItemViewModel {
     );
   }
 
-  Widget _buildListItem() {
-    return Container(
-      height: 300,
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: list_items.length,
-          itemBuilder: (context, index) {
-            return _buildRowItems(list_items[index]);
-          }),
-    );
-  }
-
-  Widget _buildRowItems(data) {
-    return InkWell(
-      onTap: () {
-        //Navigator.pushNamed(context, "/detail_item");
-      },
-      child: Container(
-        width: 180,
-        margin: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(10)),
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.black38,
-                blurRadius: 2.0,
-              ),
-            ]),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildImage(data["image"]),
-            SizedBox(
-              height: 4,
-            ),
-            Container(
-              padding: EdgeInsets.all(6),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data["name"],
-                    style: TextStyle(fontFamily: 'Montserrat', fontSize: 13),
-                  ),
-                  SizedBox(
-                    height: 7,
-                  ),
-                  Text(
-                    data["description"],
-                    style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 13,
-                        color: Colors.grey),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(
-                    height: 7,
-                  ),
-                  Text(
-                    data["price"],
-                    style: TextStyle(
-                        fontSize: 13,
-                        fontFamily: 'Roboto',
-                        color: mainGreen,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      _buildAddCart()
-                      // RaisedButton.icon(
-                      //     color: mainGreen,
-                      //     textColor: Colors.white,
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.all(Radius.circular(10))
-                      //     ),
-                      //     onPressed: (){
-                      //
-                      //     }, icon: Icon(Icons.shopping_basket,size: 20,),
-                      //     label: Text("Add to cart",style: TextStyle(color: Colors.white,fontFamily: "Montserrat",fontSize: 12),))
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddCart() {
-    return Container(
-      padding: EdgeInsets.all(5),
-      height: 30,
-      decoration: BoxDecoration(
-          color: mainGreen,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.black38,
-              blurRadius: 2.0,
-            ),
-          ]),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.shopping_basket,
-            size: 20,
-            color: Colors.white,
-          ),
-          SizedBox(
-            width: 3,
-          ),
-          Text(
-            "Add To Cart",
-            style: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Montserrat',
-                fontSize: 12,
-                fontWeight: FontWeight.bold),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildImage(String assets) {
-    return Container(
-      height: 150,
-      decoration: BoxDecoration(
-          image: DecorationImage(fit: BoxFit.cover, image: AssetImage(assets)),
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10), topRight: Radius.circular(10))),
-    );
-  }
-
   Widget _buildBottom() {
     return DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.6,
-        expand: true,
-        builder: (context, controller) {
-          return Container(
-            padding: EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-                boxShadow: [
-                  new BoxShadow(
-                    color: Colors.black38,
-                    blurRadius: 2.0,
-                  ),
-                ],
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    topLeft: Radius.circular(10))),
-            child: ListView(
-              controller: controller,
-              children: [_buildInfoItem()],
-            ),
-          );
-        });
+      initialChildSize: 0.6,
+      minChildSize: 0.6,
+      expand: true,
+      builder: (context, controller) {
+        return Container(
+          padding: EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+              boxShadow: [
+                new BoxShadow(
+                  color: Colors.black38,
+                  blurRadius: 2.0,
+                ),
+              ],
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10), topLeft: Radius.circular(10))),
+          child: ListView(
+            controller: controller,
+            children: [_buildInfoItem()],
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildInfoItem() {
@@ -214,23 +94,32 @@ class DetailItemView extends DetailItemViewModel {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                item["name"],
-                style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold),
+                data.name ?? '',
+                style: fontMonsserat(15.0, FontWeight.w500, Colors.black),
               ),
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: mainGreen,
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.favorite,
-                    color: Colors.white,
-                    size: 20,
+              BlocListener<AddFavCubit, AddFavState>(
+                listener: (context, state) {
+                  if (state is AddItemFav) {
+                    flushBar(context, state.message);
+                  } else if (state is ActionIsError) {
+                    flushBar(context, state.message);
+                  }
+                },
+                child: InkWell(
+                  onTap: () => onAddFav(data.id),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: mainGreen,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.favorite,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               )
@@ -240,20 +129,15 @@ class DetailItemView extends DetailItemViewModel {
             height: 5,
           ),
           Text(
-            item["description"],
-            style: TextStyle(
-                fontFamily: 'Montserrat', fontSize: 13, color: Colors.grey),
+            data.description ?? '',
+            style: fontMonsserat(13.0, FontWeight.w500, Colors.black45),
           ),
           SizedBox(
             height: 10,
           ),
           Text(
-            item["price"],
-            style: TextStyle(
-                fontFamily: 'Montserrat',
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: mainGreen),
+            'Rp. ${data.price}',
+            style: fontMonsserat(15.0, FontWeight.w500, mainGreen),
           ),
           SizedBox(
             height: 10,
@@ -285,34 +169,35 @@ class DetailItemView extends DetailItemViewModel {
                   ),
                 ),
               ),
-              Container(
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.shopping_cart,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      SizedBox(
-                        width: 4,
-                      ),
-                      Text(
-                        "Add To Cart",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Montserrat"),
-                      ),
-                    ],
+              InkWell(
+                onTap: () => onAddCart(data.id),
+                child: Container(
+                  padding: EdgeInsets.all(10),
+                  width: 140,
+                  decoration: BoxDecoration(
+                      color: mainGreen,
+                      borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.shopping_cart,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          "Add To Cart",
+                          style: fontMonsserat(
+                              14.0, FontWeight.w500, Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                padding: EdgeInsets.all(10),
-                width: 140,
-                decoration: BoxDecoration(
-                    color: mainGreen,
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
               )
             ],
           ),
@@ -423,7 +308,7 @@ class DetailItemView extends DetailItemViewModel {
           SizedBox(
             height: 10,
           ),
-          _buildListItem()
+          SimilarScreen()
         ],
       ),
     );
@@ -503,20 +388,16 @@ class DetailItemView extends DetailItemViewModel {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(
-              Icons.add,
+              Icons.remove,
               size: 20,
               color: Colors.white,
             ),
             Text(
               qty,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Montserrat',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+              style: fontMonsserat(16.0, FontWeight.w500, Colors.white),
             ),
             Icon(
-              Icons.remove,
+              Icons.add,
               size: 20,
               color: Colors.white,
             ),
@@ -525,4 +406,5 @@ class DetailItemView extends DetailItemViewModel {
       ),
     );
   }
+
 }

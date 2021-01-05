@@ -7,6 +7,7 @@ import 'package:tanamind/ui/auth/login/login_screen.dart';
 abstract class LoginViewModel extends State<LoginScreen>{
 
   LoginCubit cubit;
+  bool visible = true;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController email = new TextEditingController();
@@ -18,9 +19,19 @@ abstract class LoginViewModel extends State<LoginScreen>{
     super.initState();
   }
 
+  onVisible() {
+    setState(() {
+      if(visible == false){
+        visible = true;
+      }else{
+        visible = false;
+      }
+    });
+  }
+
   void onTapButtonLogin() async{
     var phoneNumber;
-    cubit.login('6285624612800', 'drow');
+    cubit.login('indra@codehouse.id', 'drow');
    /* if(!formKey.currentState.validate()){
       final snackBar = SnackBar(content: Text('Must not empty...'));
       scaffoldKey.currentState.showSnackBar(snackBar);

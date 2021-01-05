@@ -10,8 +10,13 @@ import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/shared_preferences.dart';
 import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/ui/auth/login/login_view_model.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
 
 class LoginScreen extends StatefulWidget {
+  final page;
+
+  const LoginScreen({Key key, this.page}) : super(key: key);
+
   @override
   LoginViewScreen createState() => LoginViewScreen();
 }
@@ -21,18 +26,6 @@ class LoginViewScreen extends LoginViewModel {
   var route;
   var routeID;
 
-  Future fushbar() async {
-    /* await Flushbar(
-      flushbarPosition: FlushbarPosition.BOTTOM,
-      message: 'Registration Success...',
-      backgroundColor: mainGreen,
-      duration: Duration(seconds: 4),
-    )
-      ..show(context);
-    await Future.delayed(new Duration(seconds: 5))
-        .then((value) => routeID = null);*/
-  }
-
   @override
   Widget build(BuildContext context) {
     route = ModalRoute.of(context).settings.arguments as Map<String, String>;
@@ -40,6 +33,7 @@ class LoginViewScreen extends LoginViewModel {
       routeID = route['register'];
     }
     size = MediaQuery.of(context).size;
+
     return Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomPadding: false,
@@ -49,14 +43,12 @@ class LoginViewScreen extends LoginViewModel {
             loadingDialog(context);
           } else if (state is IsLoginState) {
             print("print isLogin state : ${state.message}");
-
             Navigator.of(context).pushNamedAndRemoveUntil(
                 '/home', (Route<dynamic> route) => false);
           } else if (state is IsLoginErroState) {
             print('print error state : ${state.message}');
             Navigator.pop(context, false);
-            final snackBar = SnackBar(content: Text(state.message));
-            scaffoldKey.currentState.showSnackBar(snackBar);
+            flushBar(context, state.message);
           }
         },
         child: Stack(
@@ -171,25 +163,33 @@ class LoginViewScreen extends LoginViewModel {
                   ),
                   TextFormField(
                     controller: password,
+                    obscureText: visible,
                     /*validator: (value) => passwordValidator(value),*/
                     style: TextStyle(fontSize: 14),
                     inputFormatters: [
                       WhitelistingTextInputFormatter(RegExp(r"[a-zA-Z]+|[0-9]"))
                     ],
                     decoration: InputDecoration(
-                        hintText: 'Password',
-                        isDense: true,
-                        errorStyle: TextStyle(fontSize: 0),
-                        hintStyle: GoogleFonts.montserrat(
-                            fontWeight: FontWeight.w500, fontSize: 14),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: mainGreen, width: 1)),
-                        border: OutlineInputBorder(
+                      hintText: 'Password',
+                      isDense: true,
+                      errorStyle: TextStyle(fontSize: 0),
+                      hintStyle: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.w500, fontSize: 14),
+                      enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide(color: mainGreen, width: 2),
+                          borderSide: BorderSide(color: mainGreen, width: 1)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: mainGreen, width: 2),
+                      ),
+                      suffixIcon: InkWell(
+                        onTap: onVisible,
+                        child: Icon(
+                          Icons.remove_red_eye,
+                          color: visible ? Colors.grey : mainGreen,
                         ),
-                        suffixIcon: Icon(Icons.remove_red_eye)),
+                      ),
+                    ),
                   ),
                 ],
               ),

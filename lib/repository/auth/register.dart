@@ -16,12 +16,9 @@ class RegisterRepository {
       'password': password
     });
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      print('repository : ${response.body}');
+    if (response.statusCode == 200) {
       return response.body;
-    } else if(response.statusCode == 400){
-      return response.body;
-    }else{
+    } else {
       print('${response.body} + ${response.statusCode}');
       throw Exception();
     }

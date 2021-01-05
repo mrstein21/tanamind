@@ -29,21 +29,54 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   google_fonts: ^1.1.1
+
+  # library for dot for pagination slider
   dots_indicator: ^1.2.0
+
+  # library for rating
   smooth_star_rating: 1.1.1
+
+  # library for splash and onBoarding screen
   introduction_screen: ^1.0.7
+
+  # library for local storage
+  hive_flutter: ^0.3.0+2
+  hive_generator: ^0.7.0+2
+  build_runner: ^1.8.0
+
+  # library for share photo to socmed and getting poto from camera and gallery
   share: ^0.6.4
   image_picker: ^0.6.7+14
   path_provider: ^1.6.24
+
+  # library for responsive gridview
   flutter_staggered_grid_view: ^0.3.2
+
+  # library for auto size text depend on screen
   auto_size_text: ^2.1.0
+
+  # library for bloc state management
   flutter_bloc: ^6.1.1
   equatable: ^1.2.5
   cached_network_image: ^2.2.0+1
+
+  # library for shared preferences
   shared_preferences: ^0.5.12
+
+  # library for show toast/snackbar
   flushbar: ^1.10.4
+
+  # library for loading animation
   shimmer: ^1.1.2
+
+  # library for notification icon cart and favorite
   badges: ^1.1.6
+  icon_badge: ^0.0.1+5
+
+  # library for delay on tap button
+  tap_debouncer: ^1.0.1
+
+  image: ^2.1.19
 
 dev_dependencies:
   flutter_test:

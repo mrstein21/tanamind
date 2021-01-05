@@ -20,7 +20,7 @@ class MarketplacePromoRepository {
 
   List<MarketplacePromotionModel> jsonParse(final response) {
     var json = jsonDecode(response);
-    var data = json['data']['response'];
+    var data = json['data'];
 
     return new List<MarketplacePromotionModel>.from(
         data.map(((e) => MarketplacePromotionModel.fromJson(e))));

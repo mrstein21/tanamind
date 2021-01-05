@@ -1,14 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:tanamind/cubit/kelola/plant/plant_cubit.dart';
+import 'package:tanamind/cubit/kelola/plant/plant_state.dart';
 import 'package:tanamind/cubit/kelola/plant_category_cubit.dart';
 import 'package:tanamind/cubit/kelola/plant_category_state.dart';
+import 'package:tanamind/cubit/kelola/pot/pot_cubit.dart';
+import 'package:tanamind/cubit/kelola/pot/pot_state.dart';
 import 'package:tanamind/global.dart';
+import 'package:tanamind/helper/base_url.dart';
 import 'package:tanamind/helper/constant.dart';
 import 'package:tanamind/helper/style.dart';
+import 'package:tanamind/model/kelola_model/plant_category_model.dart';
 import 'package:tanamind/model/kelola_model/plant_model.dart';
+import 'package:tanamind/model/kelola_model/pot_model.dart';
 import 'package:tanamind/ui/kelola/kelola/kelola_view_model.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
 
 class KelolaScreen extends StatefulWidget {
   @override
@@ -17,55 +26,110 @@ class KelolaScreen extends StatefulWidget {
 
 class KelolaViewScreen extends KelolaViewModel {
   Size size;
-  double _animatedWidth = 0;
-  var _selectedIndex;
-  var _selectedIndexRight;
-
-  PlantCategoryCubit cubit;
 
   @override
   void initState() {
-    cubit = BlocProvider.of<PlantCategoryCubit>(context);
+    category = BlocProvider.of<PlantCategoryCubit>(context);
+    pot = BlocProvider.of<PotCubit>(context);
+    plant = BlocProvider.of<PlantCubit>(context);
+    if (tokenGlobal != null) {
+      category.getCategory();
+      plant.getData();
+      pot.getData();
+    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-            child: ListView(
+
+    if (tokenGlobal == null) {
+      return _buildLogin();
+    } else {
+      return Scaffold(
+        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomPadding: false,
+        body: SafeArea(
+          child: BlocListener<PotCubit, PotState>(
+            listener: (context, state){
+              if(state is PotIsDeleted){
+                pot.getData();
+                flushBar(context, state.message);
+              }else if(state is PotIsError){
+                flushBar(context, state.message);
+              }
+            },
+            child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: Text(
-                    'KELOLA',
-                    style: fontMonsserat(18.0, FontWeight.w500, Colors.black),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                        child: Text(
+                          'KELOLA',
+                          style:
+                              fontMonsserat(18.0, FontWeight.w500, Colors.black),
+                        ),
+                      ),
+                      _buildSearch(),
+                      SizedBox(
+                        height: 14,
+                      ),
+                      /*_buildFilter(),*/
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+                        child: Text(
+                          'List Pot',
+                          style:
+                              fontMonsserat(16.0, FontWeight.w500, Colors.black),
+                        ),
+                      ),
+                      _buildListPot()
+                      /*_buildListPlant()*/
+                    ],
                   ),
                 ),
-                _buildSearch(),
-                SizedBox(
-                  height: 14,
-                ),
-                _buildFilter(),
-                SizedBox(
-                  height: 12,
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
-                  child: Text(
-                    'Pot status benih',
-                    style: fontMonsserat(16.0, FontWeight.w500, Colors.black),
-                  ),
-                ),
-                _buildListPlant()
               ],
             ),
           ),
-          /*_buildFilterRight()*/
-        ],
+        ),
+      );
+    }
+  }
+
+  Widget _buildLogin() {
+    return Center(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/icon/ic_empty_plant.png'),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, top: 16),
+              child: Text(
+                'Anda harus melakukan login terlebih',
+                style: fontRoboto(16.0, FontWeight.w500, Colors.black),
+              ),
+            ),
+            InkWell(
+              onTap: () => Navigator.pushNamed(context, '/login',
+                  arguments: {'page': 'kelola'}),
+              child: Container(
+                width: 150,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                decoration: BoxDecoration(
+                    color: mainGreen, borderRadius: BorderRadius.circular(8)),
+                child: Text(
+                  'LOGIN',
+                  style: fontRoboto(14.0, FontWeight.w500, Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -143,6 +207,8 @@ class KelolaViewScreen extends KelolaViewModel {
                   ),
                   Expanded(
                     child: TextField(
+                      controller: search,
+                      onSubmitted: (value) => onSearch(value),
                       decoration: InputDecoration(
                           contentPadding: EdgeInsets.fromLTRB(8, 0, 0, 8),
                           hintText: "Cari Tanaman",
@@ -157,21 +223,21 @@ class KelolaViewScreen extends KelolaViewModel {
           InkWell(
             onTap: () {
               setState(() {
-                if (_animatedWidth == 40)
-                  _animatedWidth = 0;
+                if (animatedWidth == 40)
+                  animatedWidth = 0;
                 else
-                  _animatedWidth = 40;
+                  animatedWidth = 40;
               });
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 8.0),
               child: Container(
                 child: RotatedBox(
-                  quarterTurns: _animatedWidth == 40 ? -1 : 0,
+                  quarterTurns: animatedWidth == 40 ? -1 : 0,
                   child: Icon(
                     Icons.filter_list,
                     size: 30,
-                    color: _animatedWidth == 40 ? mainGreen : Colors.black,
+                    color: animatedWidth == 40 ? mainGreen : Colors.black,
                   ),
                 ),
               ),
@@ -197,16 +263,16 @@ class KelolaViewScreen extends KelolaViewModel {
               return InkWell(
                 onTap: () {
                   setState(() {
-                    _selectedIndex = e.name;
+                    selectedIndex = e.name;
+                    plant.getCategory('${e.id}');
                   });
                 },
                 child: Container(
                   alignment: Alignment.center,
                   padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: _selectedIndex == e.name
-                        ? mainGreen
-                        : Color(0xff81af8a),
+                    color:
+                        selectedIndex == e.name ? mainGreen : Color(0xff81af8a),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -225,18 +291,203 @@ class KelolaViewScreen extends KelolaViewModel {
     );
   }
 
-  Widget _buildListPlant() {
-    return ListView.builder(
-        itemCount: listGlobal.length,
-        reverse: true,
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return _buildCardPlant(listGlobal, index);
-        });
+  Widget _buildListPot() {
+    return BlocBuilder<PotCubit, PotState>(
+      // ignore: missing_return
+      builder: (context, state) {
+        if (state is PotIsLoading) {
+          return _buildLoading();
+        } else if (state is PotIsLoaded) {
+          if (state.list.isEmpty) {
+            return Container(
+                margin: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.1),
+                child: buildEmpty('Tidak ada item...'));
+          } else {
+            return ListView.builder(
+                itemCount: state.list.length,
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return _buildPotCard(state.list[index]);
+                });
+          }
+        } else if (state is PotIsError) {
+          return Container(
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.1),
+              child: buildError('Internal Server Error...'));
+        }
+      },
+    );
   }
 
-  Widget _buildCardPlant(var list, int index) {
+  Widget _buildPotCard(PotModel data) {
+    var image;
+    if (data.image != null) {
+      image = data.image.substring(32);
+    }
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.black45.withOpacity(0.1),
+              spreadRadius: 2.0,
+              blurRadius: 2.0,
+              offset: Offset(0, 2),
+            ),
+          ]),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: data.image != null
+                    ? CachedNetworkImage(
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
+                        imageUrl: 'http://192.168.1.14/tanamind-api/$image',
+                      )
+                    : Container(
+                        width: 120,
+                        height: 120,
+                        color: Colors.grey[300].withOpacity(0.8),
+                      ),
+              ),
+            ),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${data.name.replaceFirst(data.name[0], data.name[0].toUpperCase())}',
+                          style:
+                              fontMonsserat(14.0, FontWeight.w500, Colors.black),
+                        ),
+                        SizedBox(
+                          height: 12.0,
+                        ),
+                        Text(
+                          '${data.description.replaceFirst(data.description[0], data.description[0].toUpperCase())}',
+                          style:
+                              fontMonsserat(12.0, FontWeight.w500, Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: PopupMenuButton(
+                      offset: Offset(0, 50),
+                      onSelected: choiceAction,
+                      elevation: 4.0,
+                      itemBuilder: (BuildContext ctx) {
+                        idPot = data.id;
+                        return popButton.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: new Container(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.delete,
+                                    color: mainGreen,
+                                  ),
+                                  Text(
+                                    choice,
+                                    style: fontRoboto(
+                                        14.0, FontWeight.w500, Colors.black),
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListPlant() {
+    return BlocBuilder<PlantCubit, PlantState>(
+        // ignore: missing_return
+        builder: (context, state) {
+      if (state is PlantIsLoading) {
+        return _buildLoading();
+      } else if (state is PlantIsLoaded) {
+        if (state.list.isEmpty) {
+          return Container(
+              margin: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.1),
+              child: buildEmpty('Tidak ada item...'));
+        } else {
+          return ListView.builder(
+            itemCount: state.list.length,
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return _buildCardPlant(state.list[index], index);
+            },
+          );
+        }
+      } else if (state is PlantIsError) {
+        return Container(
+            margin:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.1),
+            child: buildError('Internal Server Error...'));
+      }
+    });
+  }
+
+  Widget _buildLoading() {
+    return ListView.builder(
+      itemCount: 3,
+      shrinkWrap: true,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            height: 130,
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey[300],
+              highlightColor: Colors.grey[100],
+              child: Container(
+                height: 130,
+                width: double.infinity,
+                color: Colors.white,
+                margin: EdgeInsets.symmetric(horizontal: 8),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCardPlant(PlantModel data, int index) {
+    var x;
+    if (data.dateProgress != null) {
+      x = (100 - data.dateProgress) / 100;
+    }
     return InkWell(
       onTap: () => Navigator.pushNamed(context, '/list_tanamanku'),
       child: Container(
@@ -261,7 +512,7 @@ class KelolaViewScreen extends KelolaViewModel {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
-                  list[index]['image'],
+                  listTanaman[index]['image'],
                   width: 120,
                   height: 120,
                   fit: BoxFit.cover,
@@ -277,29 +528,33 @@ class KelolaViewScreen extends KelolaViewModel {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('${list[index]['title']}',
+                    Text('${data.masterPlan.name}',
                         style:
                             fontMonsserat(18.0, FontWeight.w500, Colors.black)),
                     Column(
                       children: [
-                        LinearProgressIndicator(
-                          minHeight: 6,
-                          backgroundColor: Colors.grey[300],
-                          value: list[index]['panen'],
-                          valueColor:
-                              new AlwaysStoppedAnimation<Color>(Colors.green),
-                        ),
+                        data.dateProgress != null
+                            ? LinearProgressIndicator(
+                                minHeight: 6,
+                                backgroundColor: Colors.grey[300],
+                                value: x,
+                                valueColor: new AlwaysStoppedAnimation<Color>(
+                                    Colors.green),
+                              )
+                            : Container(),
                         SizedBox(
                           height: 8,
                         ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            '25 hari menuju panen',
-                            style: fontMonsserat(
-                                15.0, FontWeight.w500, Colors.black38),
-                          ),
-                        ),
+                        data.dateProgress != null
+                            ? Align(
+                                alignment: Alignment.centerRight,
+                                child: Text(
+                                  '${data.dateProgress} hari menuju panen',
+                                  style: fontMonsserat(
+                                      15.0, FontWeight.w500, Colors.black38),
+                                ),
+                              )
+                            : Container(),
                       ],
                     )
                   ],

@@ -1,10 +1,15 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/style.dart';
 
 class FABBottomAppBarItem {
-  FABBottomAppBarItem({this.iconData, this.text, this.fSize});
+  FABBottomAppBarItem({this.iconData, this.text, this.fSize, this.cartLength});
+
   IconData iconData;
   String text;
+  int cartLength;
   double fSize;
 }
 
@@ -22,6 +27,7 @@ class FABBottomAppBar extends StatefulWidget {
   }) {
     assert(this.items.length == 2 || this.items.length == 4);
   }
+
   final List<FABBottomAppBarItem> items;
   final String centerItemText;
   final double height;
@@ -67,6 +73,7 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
       color: widget.backgroundColor,
     );
   }
+
   Widget _buildMiddleTabItem() {
     return Expanded(
       child: SizedBox(
@@ -91,7 +98,6 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
     int index,
     ValueChanged<int> onPressed,
   }) {
-    print(item.fSize);
     Color color = _selectedIndex == index ? widget.selectedColor : widget.color;
     return Expanded(
       child: SizedBox(

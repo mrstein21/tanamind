@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/helper/constant.dart';
+import 'package:tanamind/helper/style.dart';
 import 'package:tanamind/ui/profile/profile_view_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -21,15 +23,55 @@ class ProfileView extends ProfileViewModel {
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: ListView(
-        children: [
-          _buildImage(),
-          _buildTokoku(),
-          _buildWallet(),
-          _buildTransaksi(),
-          _buildFaq()
-        ],
+
+    if (tokenGlobal != null) {
+      return Scaffold(
+        body: ListView(
+          children: [
+            _buildImage(),
+            _buildTokoku(),
+            _buildWallet(),
+            _buildTransaksi(),
+            _buildFaq()
+          ],
+        ),
+      );
+    } else {
+      return _buildLogin();
+    }
+  }
+
+  Widget _buildLogin() {
+    return Center(
+      child: Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/icon/ic_empty_plant.png'),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0, top: 16),
+              child: Text(
+                'Anda harus melakukan login terlebih',
+                style: fontRoboto(16.0, FontWeight.w500, Colors.black),
+              ),
+            ),
+            InkWell(
+              onTap: () => Navigator.pushNamed(context, '/login',
+                  arguments: {'page': 'kelola'}),
+              child: Container(
+                width: 150,
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                decoration: BoxDecoration(
+                    color: mainGreen, borderRadius: BorderRadius.circular(8)),
+                child: Text(
+                  'LOGIN',
+                  style: fontRoboto(14.0, FontWeight.w500, Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -41,21 +83,27 @@ class ProfileView extends ProfileViewModel {
           width: 50,
           child: CircleAvatar(
             child: Text(
-              userInitial ?? "U",
-              style: TextStyle(
-                  fontFamily: "Roboto",
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
+              userName != null ? userName[0].toUpperCase() ?? '?' : '?',
+              style: GoogleFonts.roboto(
+                  fontSize: 30.0,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white),
             ),
             /*backgroundImage: AssetImage('assets/dummy/richard.jpg'),*/
           )),
       title: Text(
-        userName ??
-            'Richard',
+       userName ?? 'Richard',
         style: GoogleFonts.roboto(),
       ),
       subtitle: InkWell(
-        onTap: () => Navigator.pushNamed(context, '/edit_profile'),
+        onTap: () {
+          Navigator.pushNamed(context, '/edit_profile', arguments: {
+            'userId': id,
+            'name': userName,
+            'phone': phone,
+            'email': email,
+          });
+        },
         child: Row(
           children: [
             Icon(

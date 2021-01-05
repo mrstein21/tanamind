@@ -8,8 +8,19 @@ class ItemsIsLoading extends CategoryItemState {
   List<Object> get props => [];
 }
 
+class ItemGetData extends CategoryItemState{
+  @override
+  List<Object> get props => [];
+
+}
+
+class ItemSearch extends CategoryItemState{
+  @override
+  List<Object> get props => [];
+
+}
+
 class ItemsIsLoaded extends CategoryItemState {
- /* final List<CategoryItem> list;*/
   final list;
 
   ItemsIsLoaded({@required this.list});
@@ -25,6 +36,12 @@ class ItemsIsLoadMore extends CategoryItemState{
 
   @override
   List<Object> get props => [list];
+
+}
+
+class ItemFilter extends CategoryItemState{
+  @override
+  List<Object> get props => [];
 
 }
 

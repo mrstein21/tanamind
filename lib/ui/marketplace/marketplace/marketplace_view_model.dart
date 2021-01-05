@@ -1,67 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:tanamind/ui/marketplace/marketplace/build_list_recomendation.dart';
+import 'package:tanamind/cubit/favourite/add_fav_cubit.dart';
+import 'package:tanamind/cubit/marketplace/cart/add_cart_cubit.dart';
+import 'package:tanamind/cubit/marketplace/similar_item/similar_item_cubit.dart';
+import 'package:tanamind/global.dart';
 import 'package:tanamind/ui/marketplace/marketplace/build_list_promotion.dart';
+import 'package:tanamind/ui/marketplace/marketplace/build_list_recomendation.dart';
+import 'package:tanamind/ui/widget/widget_helper.dart';
+
 import 'marketplace_screen.dart';
 
 abstract class MarketPlaceViewModel extends State<MarketPlaceScreen> {
+  SimilarCubit cubit;
+  AddFavCubit fav;
+  AddCartCubit cart;
+
   var list_items = [
-    {
-      "name": "Bibit Kangkung",
-      "price": "Rp. 2.500",
-      "description": "Short Description here...",
-      "image": "assets/dummy/bibit_kangkung.jpg"
-    },
-    {
-      "name": "Bibit Kantang",
-      "price": "Rp. 10.000",
-      "description": "Short and Long Description here...",
-      "image": "assets/dummy/bibit_kentang.jpg"
-    },
-    {
-      "name": "Pot Hidroponik",
-      "price": "Rp. 325.000",
-      "description": "Short Description here...",
-      "image": "assets/dummy/hidroponik.jpg"
-    },
-    {
-      "name": "Pompa Air Hiroponik",
-      "price": "Rp. 100.000",
-      "description": "Short Description here...",
-      "image": "assets/dummy/pompa_air.jpg"
-    },
-    {
-      "name": "Pot Bunga",
-      "price": "Rp. 30.000",
-      "description": "Short Description here...",
-      "image": "assets/dummy/pot_bunga.jpg"
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/pompa_air.jpg"},
+    {"image": "assets/dummy/pot_bunga.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/pompa_air.jpg"},
+    {"image": "assets/dummy/pot_bunga.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/pompa_air.jpg"},
+    {"image": "assets/dummy/pot_bunga.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/pompa_air.jpg"},
+  ];
+
+  Future onAddCart(var id) async {
+    print(tokenGlobal);
+    if (tokenGlobal != null) {
+      cart.addItem('$id');
+    } else {
+      flushBar(context, 'Anda harus login terlebih dahulu');
     }
-  ];
+  }
 
-  var category = [
-    {"name": "Alat", "icon": Icons.settings},
-    {"name": "Pot", "icon": Icons.shopping_basket},
-    {"name": "Bibit", "icon": Icons.shop},
-    {"name": "Tanaman", "icon": Icons.wb_cloudy},
-    {"name": "Tanah", "icon": Icons.camera},
-    {"name": "Pupuk", "icon": Icons.scanner},
-    {"name": "Lain-lain", "icon": Icons.dashboard}
-  ];
-
-  void navigationCategory(int index) {
-    if (category[index]['name'] == 'Alat') {
-      Navigator.pushNamed(context, '/alat_screen');
-    } else if (category[index]['name'] == 'Pot') {
-      Navigator.pushNamed(context, '/pot_screen');
-    } else if (category[index]['name'] == 'Bibit') {
-      Navigator.pushNamed(context, '/bibit_screen');
-    } else if (category[index]['name'] == 'Tanaman') {
-      Navigator.pushNamed(context, '/tanaman_screen');
-    } else if (category[index]['name'] == 'Tanah') {
-      Navigator.pushNamed(context, '/tanah_screen');
-    } else if (category[index]['name'] == 'Pupuk') {
-      Navigator.pushNamed(context, '/pupuk_screen');
-    } else if (category[index]['name'] == 'Lain-lain') {
-      Navigator.pushNamed(context, '/etc_screen');
+  Future onTapButtonFav(final id) async {
+    if(tokenGlobal != null){
+      fav.addItem('$id');
+    }else{
+      flushBar(context, 'Anda harus login terlebih dahulu');
     }
   }
 }
@@ -76,24 +64,39 @@ abstract class ListPromotionModel extends State<ListPromotion> {
 }
 
 abstract class ListRecommendationModel extends State<ListRecommendation> {
+  AddFavCubit fav;
+  SimilarCubit cubit;
+  AddCartCubit cart;
+
   var recommended = [
-    {
-      "name": "Bibit Kangkung",
-      "price": "Rp. 2.500",
-      "description": "Short Description here...",
-      "image": "assets/dummy/bibit_kangkung.jpg"
-    },
-    {
-      "name": "Bibit Kantang",
-      "price": "Rp. 10.000",
-      "description": "Short and Long Description here...",
-      "image": "assets/dummy/bibit_kentang.jpg"
-    },
-    {
-      "name": "Pot Hidroponik",
-      "price": "Rp. 325.000",
-      "description": "Short Description here...",
-      "image": "assets/dummy/hidroponik.jpg"
-    }
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"},
+    {"image": "assets/dummy/bibit_kangkung.jpg"},
+    {"image": "assets/dummy/bibit_kentang.jpg"},
+    {"image": "assets/dummy/hidroponik.jpg"}
   ];
+
+  Future onTapAddFav(var id) async {
+    if (tokenGlobal != null) {
+      fav.addItem('$id');
+    } else {
+      flushBar(context, 'Anda harus login terlebih dahulu');
+    }
+  }
+
+  Future onAddCart(var id) async {
+    print(tokenGlobal);
+    if (tokenGlobal != null) {
+      cart.addItem('$id');
+    } else {
+      flushBar(context, 'Anda harus login terlebih dahulu');
+    }
+  }
 }

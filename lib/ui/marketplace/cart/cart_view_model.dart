@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tanamind/ui/marketplace/cart/cart_screen.dart';
+import 'package:hive/hive.dart';
 
 abstract class CartViewModel extends State<CartScreen> {
   var list_carts = [
@@ -44,4 +45,8 @@ abstract class CartViewModel extends State<CartScreen> {
       "image": "assets/dummy/pot_bunga.jpg"
     }
   ];
+
+  Future<void> getHiveBox() async {
+    Hive.openBox('cartmodel');
+  }
 }

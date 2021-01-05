@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:tanamind/model/kelola_model/plant_model.dart';
+import 'package:tanamind/model/kelola_model/plant_category_model.dart';
 import 'package:meta/meta.dart';
 
 abstract class PlantCategoryState extends Equatable {}
